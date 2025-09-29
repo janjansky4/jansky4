@@ -2,122 +2,132 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Můj Eshop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matematika jednoduše</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f9f9f9;
       margin: 0;
       padding: 0;
-      background: #f8f8f8;
+      color: #333;
     }
+
     header {
-      background-color: #007bff;
+      background-color: #6200ea;
       color: white;
-      padding: 1rem 2rem;
+      padding: 2rem 1rem;
       text-align: center;
     }
-    nav a {
-      color: white;
-      margin: 0 1rem;
-      text-decoration: none;
-      font-weight: bold;
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
     }
+
     main {
-      max-width: 1000px;
+      max-width: 800px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
-    h1, h2 {
-      text-align: center;
+
+    section {
+      margin-bottom: 3rem;
     }
-    .products {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: center;
+
+    h2 {
+      color: #6200ea;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
     }
-    .product {
-      background: white;
-      border-radius: 5px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+
+    .equation {
+      background-color: #fff;
       padding: 1rem;
-      width: 250px;
-      text-align: center;
-    }
-    .product img {
-      max-width: 100%;
-      border-radius: 5px;
-    }
-    .product h3 {
-      margin: 1rem 0 0.5rem;
-    }
-    .price {
-      color: #28a745;
-      font-weight: bold;
+      margin: 1rem 0;
+      border-left: 4px solid #6200ea;
       font-size: 1.2rem;
-      margin-bottom: 1rem;
     }
-    button {
-      background-color: #007bff;
-      border: none;
-      padding: 0.5rem 1rem;
-      color: white;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
+
     footer {
       text-align: center;
       padding: 1rem;
-      background: #222;
-      color: white;
-      margin-top: 3rem;
+      background-color: #eee;
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>Můj Eshop</h1>
-    <nav>
-      <a href="#">Domů</a>
-      <a href="#">Produkty</a>
-      <a href="#">Kontakt</a>
-      <a href="#">Košík</a>
-    </nav>
+    <h1>Matematika jednoduše</h1>
+    <p>Web pro studenty, nadšence i učitele</p>
   </header>
 
   <main>
-    <h2>Naše produkty</h2>
-    <div class="products">
-      <div class="product">
-        <img src="https://via.placeholder.com/250x150?text=Produkt+1" alt="Produkt 1" />
-        <h3>Produkt 1</h3>
-        <p class="price">499 Kč</p>
-        <button>Přidat do košíku</button>
+    <section>
+      <h2>Úvod</h2>
+      <p>Vítejte na stránce věnované krásám matematiky. Najdete zde důležité vzorce, vysvětlení a tipy.</p>
+    </section>
+
+    <section>
+      <h2>Základní rovnice</h2>
+      <div class="equation">
+        Kvadratická rovnice:  
+        <br>
+        \\[ ax^2 + bx + c = 0 \\]
       </div>
 
-      <div class="product">
-        <img src="https://via.placeholder.com/250x150?text=Produkt+2" alt="Produkt 2" />
-        <h3>Produkt 2</h3>
-        <p class="price">899 Kč</p>
-        <button>Přidat do košíku</button>
+      <div class="equation">
+        Vzorec pro výpočet diskriminantu:
+        <br>
+        \\[ D = b^2 - 4ac \\]
       </div>
 
-      <div class="product">
-        <img src="https://via.placeholder.com/250x150?text=Produkt+3" alt="Produkt 3" />
-        <h3>Produkt 3</h3>
-        <p class="price">299 Kč</p>
-        <button>Přidat do košíku</button>
+      <div class="equation">
+        Vzorec pro výpočet řešení:
+        <br>
+        \\[ x = \\frac{-b \\pm \\sqrt{D}}{2a} \\]
       </div>
-    </div>
+    </section>
+
+    <section>
+      <h2>Teorie limit</h2>
+      <p>Definice limity podle Weierstrasse:</p>
+      <div class="equation">
+        \\[
+        \\lim_{x \\to a} f(x) = L \\iff \\forall \\varepsilon > 0\\; \\exists \\delta > 0:\\; 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon
+        \\]
+      </div>
+    </section>
+
+    <section>
+      <h2>Derivace a integrály</h2>
+      <div class="equation">
+        Derivace funkce:
+        \\[ f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h} \\]
+      </div>
+      <div class="equation">
+        Určitý integrál:
+        \\[ \\int_a^b f(x)\\,dx \\]
+      </div>
+    </section>
   </main>
 
   <footer>
-    &copy; 2025 Můj Eshop | Všechna práva vyhrazena
+    &copy; 2025 Matematika jednoduše | Vytvořeno s ❤️ pro GitHub Pages
   </footer>
 </body>
 </html>
