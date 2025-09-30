@@ -1,144 +1,70 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matematika jednoduše</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <!-- MathJax -->
-  <script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['\\[', '\\]']],
-    },
-    svg: {
-      fontCache: 'global'
-    }
-  };
-</script>
-  <script type="text/javascript" async
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matematika moderně</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f9f9f9;
       margin: 0;
       padding: 0;
+      background: #f4f4f9;
       color: #333;
     }
-
     header {
-      background-color: #6200ea;
+      background: #6200ea;
       color: white;
-      padding: 2rem 1rem;
+      padding: 2rem;
       text-align: center;
     }
-
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-    }
-
     main {
+      padding: 2rem;
       max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      margin: auto;
     }
-
     section {
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
     }
-
-    h2 {
-      color: #6200ea;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 0.5rem;
+    h1, h2 {
+      margin-bottom: 1rem;
     }
-
-    .equation {
-      background-color: #fff;
+    .formula {
+      background: #fff;
       padding: 1rem;
-      margin: 1rem 0;
-      border-left: 4px solid #6200ea;
-      font-size: 1.2rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #eee;
-      color: #666;
-    }
-
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 2rem;
-      }
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-
   <header>
-    <h1>Matematika jednoduše</h1>
-    <p>Web pro studenty, nadšence i učitele</p>
+    <h1>Matematika moderně</h1>
+    <p>Objevte krásu rovnic a logiky</p>
   </header>
-
   <main>
     <section>
-      <h2>Úvod</h2>
-      <p>Vítejte na stránce věnované krásám matematiky. Najdete zde důležité vzorce, vysvětlení a tipy.</p>
-    </section>
-
-    <section>
-      <h2>Základní rovnice</h2>
-      <div class="equation">
-        Kvadratická rovnice:  
-        <br>
-        \\[ ax^2 + bx + c = 0 \\]
-      </div>
-
-      <div class="equation">
-        Vzorec pro výpočet diskriminantu:
-        <br>
-        \\[ D = b^2 - 4ac \\]
-      </div>
-
-      <div class="equation">
-        Vzorec pro výpočet řešení:
-        <br>
-        \\[ x = \\frac{-b \\pm \\sqrt{D}}{2a} \\]
+      <h2>📐 Pythagorova věta</h2>
+      <div class="formula">
+        $$ a^2 + b^2 = c^2 $$
       </div>
     </section>
-
     <section>
-      <h2>Teorie limit</h2>
-      <p>Definice limity podle Weierstrasse:</p>
-      <div class="equation">
-        \\[
-        \\lim_{x \\to a} f(x) = L \\iff \\forall \\varepsilon > 0\\; \\exists \\delta > 0:\\; 0 < |x - a| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon
-        \\]
+      <h2>📊 Kvadratická rovnice</h2>
+      <div class="formula">
+        $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
       </div>
     </section>
-
     <section>
-      <h2>Derivace a integrály</h2>
-      <div class="equation">
-        Derivace funkce:
-        \\[ f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h} \\]
-      </div>
-      <div class="equation">
-        Určitý integrál:
-        \\[ \\int_a^b f(x)\\,dx \\]
+      <h2>📈 Derivace funkce</h2>
+      <div class="formula">
+        $$ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} $$
       </div>
     </section>
   </main>
-
-  <footer>
-    &copy; 2025 Matematika jednoduše | Vytvořeno s ❤️ pro GitHub Pages
-  </footer>
 </body>
-</html>
