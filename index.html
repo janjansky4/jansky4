@@ -66,5 +66,50 @@
         $$ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} $$
       </div>
     </section>
+    <section>
+  <h2>🧠 Mini kvíz</h2>
+  <form id="quizForm">
+    <div class="formula">
+      <p><strong>1. Jaký je výsledek výrazu  $$ a^2 + b^2 $$, pokud $$ a = 3 $$ a $$ b = 4 $$?</strong></p>
+      <label><input type="radio" name="q1" value="0"> 16</label><br>
+      <label><input type="radio" name="q1" value="1"> 25</label><br>
+      <label><input type="radio" name="q1" value="2"> 12</label><br>
+      <label><input type="radio" name="q1" value="3"> 7</label>
+    </div>
+    <div class="formula">
+      <p><strong>2. Co představuje 'c' v Pythagorově větě?</strong></p>
+      <label><input type="radio" name="q2" value="0"> Odvěsna</label><br>
+      <label><input type="radio" name="q2" value="1"> Obsah trojúhelníku</label><br>
+      <label><input type="radio" name="q2" value="2"> Přepona</label><br>
+      <label><input type="radio" name="q2" value="3"> Výška</label>
+    </div>
+    <div class="formula">
+      <p><strong>3. Co znamená limita v definici derivace?</strong></p>
+      <label><input type="radio" name="q3" value="0"> Změna směru</label><br>
+      <label><input type="radio" name="q3" value="1"> Přiblížení k určité hodnotě</label><br>
+      <label><input type="radio" name="q3" value="2"> Rozdíl mezi funkcemi</label><br>
+      <label><input type="radio" name="q3" value="3"> Součet hodnot</label>
+    </div>
+    <button type="button" onclick="vyhodnotitKviz()">Vyhodnotit</button>
+  </form>
+  <div id="vysledek" class="formula" style="margin-top:1rem;"></div>
+</section>
+
   </main>
+<script>
+  function vyhodnotitKviz() {
+    const spravne = [1, 2, 1];
+    let body = 0;
+    for (let i = 1; i <= spravne.length; i++) {
+      const odpoved = document.querySelector(`input[name="q${i}"]:checked`);
+      if (odpoved && parseInt(odpoved.value) === spravne[i - 1]) {
+        body++;
+      }
+    }
+    const vysledek = document.getElementById("vysledek");
+    vysledek.innerHTML = `<strong>Výsledek:</strong> ${body} z ${spravne.length} správně.`;
+  }
+</script>
+
+  
 </body>
