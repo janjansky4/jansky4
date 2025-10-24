@@ -134,51 +134,51 @@
   </main>
   <section id="test">
   <h2>Závěrečný test</h2>
-  <form id="quizForm">
-    <div>
-      <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
-      <label><input type="radio" name="q1" value="A"> A) \( 2x^2 - 7x - 15 \)</label><br>
-      <label><input type="radio" name="q1" value="B"> B) \( 2x^2 + 7x - 15 \)</label><br>
-      <label><input type="radio" name="q1" value="C"> C) \( 2x^2 - 10x + 15 \)</label><br>
-      <label><input type="radio" name="q1" value="D"> D) \( 2x^2 - 13x - 15 \)</label>
-    </div>
 
-    <div>
-      <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
-      <label><input type="radio" name="q2" value="A"> A) \( 4\pi \)</label><br>
-      <label><input type="radio" name="q2" value="B"> B) \( 8\pi \)</label><br>
-      <label><input type="radio" name="q2" value="C"> C) \( 16\pi \)</label><br>
-      <label><input type="radio" name="q2" value="D"> D) \( 12\pi \)</label>
-    </div>
+  <div class="latex-block">
+    <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
+    <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label><br>
+    <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label><br>
+    <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label><br>
+    <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
+  </div>
 
-    <div>
-      <p><strong>3. Která z funkcí je rostoucí na celém definičním oboru?</strong></p>
-      <label><input type="radio" name="q3" value="A"> A) \( \sqrt{x} \)</label><br>
-      <label><input type="radio" name="q3" value="B"> B) \( x^3 \)</label><br>
-      <label><input type="radio" name="q3" value="C"> C) \( \frac{1}{x} \)</label><br>
-      <label><input type="radio" name="q3" value="D"> D) \( -x^2 \)</label>
-    </div>
+  <div class="latex-block">
+    <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
+    <label><input type="radio" name="q2" value="A"> \( 4\pi \)</label><br>
+    <label><input type="radio" name="q2" value="B"> \( 8\pi \)</label><br>
+    <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label><br>
+    <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
+  </div>
 
-    <div>
-      <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
-      <label><input type="radio" name="q4" value="A"> A) \( \cos(x) \)</label><br>
-      <label><input type="radio" name="q4" value="B"> B) \( -\cos(x) \)</label><br>
-      <label><input type="radio" name="q4" value="C"> C) \( \sin(x) \)</label><br>
-      <label><input type="radio" name="q4" value="D"> D) \( -\sin(x) \)</label>
-    </div>
+  <div class="latex-block">
+    <p><strong>3. Která z funkcí je rostoucí na celém definičním oboru?</strong></p>
+    <label><input type="radio" name="q3" value="A"> \( \sqrt{x} \)</label><br>
+    <label><input type="radio" name="q3" value="B"> \( x^3 \)</label><br>
+    <label><input type="radio" name="q3" value="C"> \( \frac{1}{x} \)</label><br>
+    <label><input type="radio" name="q3" value="D"> \( -x^2 \)</label>
+  </div>
 
-    <div>
-      <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
-      <label><input type="radio" name="q5" value="A"> A) 180°</label><br>
-      <label><input type="radio" name="q5" value="B"> B) 270°</label><br>
-      <label><input type="radio" name="q5" value="C"> C) 360°</label><br>
-      <label><input type="radio" name="q5" value="D"> D) 90°</label>
-    </div>
+  <div class="latex-block">
+    <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
+    <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label><br>
+    <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label><br>
+    <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label><br>
+    <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
+  </div>
 
-    <button type="button" onclick="vyhodnotitTest()">Vyhodnotit test</button>
-  </form>
+  <div class="latex-block">
+    <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
+    <label><input type="radio" name="q5" value="A"> 180°</label><br>
+    <label><input type="radio" name="q5" value="B"> 270°</label><br>
+    <label><input type="radio" name="q5" value="C"> 360°</label><br>
+    <label><input type="radio" name="q5" value="D"> 90°</label>
+  </div>
 
-  <div id="vysledek" style="margin-top: 1rem; font-weight: bold;"></div>
+  <div class="latex-block" style="text-align: center;">
+    <button type="button" onclick="vyhodnotitTest()" style="padding: 0.5rem 1rem; background-color: #2c3e50; color: white; border: none; border-radius: 4px; font-weight: bold;">Vyhodnotit test</button>
+    <div id="vysledek" style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;"></div>
+  </div>
 
   <script>
     function vyhodnotitTest() {
@@ -199,7 +199,7 @@
       document.getElementById("vysledek").innerText = `Získal(a) jsi ${body} z 5 bodů.`;
     }
   </script>
-  </section>
+</section>
   <footer>
     &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
   </footer>
