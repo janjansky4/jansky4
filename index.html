@@ -132,85 +132,93 @@
       </div>
     </section>
   </main>
-<section id="test">
-  <h2>Závěrečný test</h2>
 
-  <div class="latex-block">
-    <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
-    <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label><br>
-    <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label><br>
-    <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label><br>
-    <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
-  </div>
+  <section id="test">
+    <h2>Závěrečný test</h2>
 
-  <div class="latex-block">
-    <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
-    <label><input type="radio" name="q2" value="A"> \( 8\pi \)</label><br>
-    <label><input type="radio" name="q2" value="B"> \( 4\pi \)</label><br>
-    <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label><br>
-    <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
-  </div>
-  
-  <div class="latex-block">
-    <p><strong>3. Jaký je výsledek výrazu \( \log_{2}(8) \)?</strong></p>
-    <label><input type="radio" name="q3" value="A"> 2</label><br>
-    <label><input type="radio" name="q3" value="B"> 3</label><br>
-    <label><input type="radio" name="q3" value="C"> 4</label><br>
-    <label><input type="radio" name="q3" value="D"> 1</label>
-  </div>
+    <!-- ✅ Přidán formulář -->
+    <form id="quizForm">
 
+      <div class="latex-block">
+        <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
+        <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label><br>
+        <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label><br>
+        <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label><br>
+        <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
+      </div>
 
-  <div class="latex-block">
-    <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
-    <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label><br>
-    <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label><br>
-    <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label><br>
-    <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
-  </div>
+      <div class="latex-block">
+        <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
+        <label><input type="radio" name="q2" value="A"> \( 8\pi \)</label><br>
+        <label><input type="radio" name="q2" value="B"> \( 4\pi \)</label><br>
+        <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label><br>
+        <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
+      </div>
 
-  <div class="latex-block">
-    <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
-    <label><input type="radio" name="q5" value="A"> 180°</label><br>
-    <label><input type="radio" name="q5" value="B"> 270°</label><br>
-    <label><input type="radio" name="q5" value="C"> 360°</label><br>
-    <label><input type="radio" name="q5" value="D"> 90°</label>
-  </div>
+      <div class="latex-block">
+        <p><strong>3. Jaký je výsledek výrazu \( \log_{2}(8) \)?</strong></p>
+        <label><input type="radio" name="q3" value="A"> 2</label><br>
+        <label><input type="radio" name="q3" value="B"> 3</label><br>
+        <label><input type="radio" name="q3" value="C"> 4</label><br>
+        <label><input type="radio" name="q3" value="D"> 1</label>
+      </div>
 
-  <div class="latex-block" style="text-align: center;">
-    <button type="button" onclick="vyhodnotitTest()" style="padding: 0.5rem 1rem; background-color: #2c3e50; color: white; border: none; border-radius: 4px; font-weight: bold;">Vyhodnotit test</button>
-    <div id="vysledek" style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;"></div>
-  </div>
+      <div class="latex-block">
+        <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
+        <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label><br>
+        <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label><br>
+        <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label><br>
+        <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
+      </div>
 
-<script>
-  // Vyhodnocení testu
-  function vyhodnotitTest() {
-    const odpovedi = {
-      q1: "A",
-      q2: "C",
-      q3: "B",
-      q4: "A",
-      q5: "A"
-    };
-    let body = 0;
-    for (let i = 1; i <= 5; i++) {
-      const otazka = document.querySelector(`input[name="q${i}"]:checked`);
-      if (otazka && otazka.value === odpovedi[`q${i}`]) {
-        body++;
-      }
-    }
-    document.getElementById("vysledek").innerText = `Získal(a) jsi ${body} z 5 bodů.`;
-  }
+      <div class="latex-block">
+        <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
+        <label><input type="radio" name="q5" value="A"> 180°</label><br>
+        <label><input type="radio" name="q5" value="B"> 270°</label><br>
+        <label><input type="radio" name="q5" value="C"> 360°</label><br>
+        <label><input type="radio" name="q5" value="D"> 90°</label>
+      </div>
 
-  // Reset testu při načtení stránky
-  window.addEventListener("load", () => {
-    document.getElementById("quizForm").reset();
-    document.getElementById("vysledek").innerText = "";
-  });
-</script>
+      <div class="latex-block" style="text-align: center;">
+        <button type="button" onclick="vyhodnotitTest()" style="padding: 0.5rem 1rem; background-color: #2c3e50; color: white; border: none; border-radius: 4px; font-weight: bold;">Vyhodnotit test</button>
+        <div id="vysledek" style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;"></div>
+      </div>
 
-</section>
+    </form>
+    <!-- ✅ Konec formuláře -->
+  </section>
+
   <footer>
     &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
   </footer>
+
+  <script>
+    // Vyhodnocení testu
+    function vyhodnotitTest() {
+      const odpovedi = {
+        q1: "A",
+        q2: "C",
+        q3: "B",
+        q4: "A",
+        q5: "A"
+      };
+      let body = 0;
+      for (let i = 1; i <= 5; i++) {
+        const otazka = document.querySelector(`input[name="q${i}"]:checked`);
+        if (otazka && otazka.value === odpovedi[`q${i}`]) {
+          body++;
+        }
+      }
+      document.getElementById("vysledek").innerText = `Získal(a) jsi ${body} z 5 bodů.`;
+    }
+
+    // ✅ Reset testu při načtení stránky
+    window.addEventListener("load", () => {
+      const form = document.getElementById("quizForm");
+      if (form) form.reset();
+      const vysledek = document.getElementById("vysledek");
+      if (vysledek) vysledek.innerText = "";
+    });
+  </script>
 </body>
 </html>
