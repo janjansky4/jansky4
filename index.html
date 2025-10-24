@@ -8,29 +8,38 @@
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
+    /* === ZÁKLADNÍ STYL === */
     body {
       font-family: 'Roboto', sans-serif;
       background: #f0f4f8;
       margin: 0;
       padding: 0;
     }
+
     header {
       background: #34495e;
       color: white;
       padding: 2rem;
       text-align: center;
     }
+
     nav {
       background: #2c3e50;
       padding: 1rem;
       text-align: center;
     }
+
     nav a {
       color: white;
       margin: 0 1rem;
       text-decoration: none;
       font-weight: bold;
     }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
     main {
       max-width: 1000px;
       margin: 2rem auto;
@@ -39,22 +48,73 @@
       border-radius: 8px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
+
     h1, h2 {
       color: #2c3e50;
     }
-    .latex-block {
+
+    /* === SJEDNOCENÝ STYL KARTIČEK (teorie + test) === */
+    .card {
       background: #ecf0f1;
-      padding: 1rem;
-      border-radius: 6px;
-      margin: 1rem 0;
-      font-size: 1.2rem;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
+
+    .card:hover {
+      transform: scale(1.01);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    }
+
+    /* === TLAČÍTKA === */
+    button {
+      padding: 0.6rem 1.2rem;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #1a252f;
+    }
+
+    /* === VÝSLEDEK TESTU === */
+    #vysledek {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #2c3e50;
+      background: #dff9fb;
+      padding: 0.6rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
     footer {
       text-align: center;
       padding: 2rem;
       background: #34495e;
       color: white;
       margin-top: 3rem;
+    }
+
+    /* === FORM STYL === */
+    label {
+      display: block;
+      margin: 0.4rem 0;
+      cursor: pointer;
+    }
+
+    input[type="radio"] {
+      margin-right: 0.5rem;
     }
   </style>
 </head>
@@ -63,6 +123,7 @@
     <h1>Matematika pro střední školy</h1>
     <p>Objev krásu matematiky s pomocí LaTeX</p>
   </header>
+
   <nav>
     <a href="#algebra">Algebra</a>
     <a href="#geometrie">Geometrie</a>
@@ -71,120 +132,118 @@
     <a href="#derivace">Derivace</a>
     <a href="#test">Test</a>
   </nav>
+
   <main>
     <section id="algebra">
       <h2>Algebra</h2>
-      <p>Řešení kvadratické rovnice:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Řešení kvadratické rovnice:</strong></p>
         $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
       </div>
-      <p>Binomická věta:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Binomická věta:</strong></p>
         $$(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k$$
       </div>
     </section>
 
     <section id="geometrie">
       <h2>Geometrie</h2>
-      <p>Obsah kruhu:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Obsah kruhu:</strong></p>
         $$S = \pi r^2$$
       </div>
-      <p>Obvod trojúhelníku:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Obvod trojúhelníku:</strong></p>
         $$o = a + b + c$$
       </div>
     </section>
 
     <section id="analyticka">
       <h2>Analytická geometrie</h2>
-      <p>Rovnice přímky v rovině:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Rovnice přímky v rovině:</strong></p>
         $$y = kx + q$$
       </div>
-      <p>Vzdálenost dvou bodů:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Vzdálenost dvou bodů:</strong></p>
         $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
       </div>
     </section>
 
     <section id="funkce">
       <h2>Funkce</h2>
-      <p>Definice kvadratické funkce:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Definice kvadratické funkce:</strong></p>
         $$f(x) = ax^2 + bx + c$$
       </div>
-      <p>Exponenciální funkce:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Exponenciální funkce:</strong></p>
         $$f(x) = a^x$$
       </div>
     </section>
 
     <section id="derivace">
       <h2>Derivace</h2>
-      <p>Derivace mocninné funkce:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Derivace mocninné funkce:</strong></p>
         $$\frac{d}{dx} x^n = nx^{n-1}$$
       </div>
-      <p>Derivace součtu funkcí:</p>
-      <div class="latex-block">
+      <div class="card">
+        <p><strong>Derivace součtu funkcí:</strong></p>
         $$\frac{d}{dx}(f(x) + g(x)) = f'(x) + g'(x)$$
       </div>
     </section>
+
+    <section id="test">
+      <h2>Závěrečný test</h2>
+      <form id="quizForm">
+        <div class="card">
+          <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
+          <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label>
+          <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label>
+          <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label>
+          <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
+        </div>
+
+        <div class="card">
+          <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
+          <label><input type="radio" name="q2" value="A"> \( 8\pi \)</label>
+          <label><input type="radio" name="q2" value="B"> \( 4\pi \)</label>
+          <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label>
+          <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
+        </div>
+
+        <div class="card">
+          <p><strong>3. Jaký je výsledek výrazu \( \log_{2}(8) \)?</strong></p>
+          <label><input type="radio" name="q3" value="A"> 2</label>
+          <label><input type="radio" name="q3" value="B"> 3</label>
+          <label><input type="radio" name="q3" value="C"> 4</label>
+          <label><input type="radio" name="q3" value="D"> 1</label>
+        </div>
+
+        <div class="card">
+          <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
+          <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label>
+          <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label>
+          <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label>
+          <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
+        </div>
+
+        <div class="card">
+          <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
+          <label><input type="radio" name="q5" value="A"> 180°</label>
+          <label><input type="radio" name="q5" value="B"> 270°</label>
+          <label><input type="radio" name="q5" value="C"> 360°</label>
+          <label><input type="radio" name="q5" value="D"> 90°</label>
+        </div>
+
+        <div class="card" style="text-align: center;">
+          <button type="button" onclick="vyhodnotitTest()">Vyhodnotit test</button>
+          <div id="vysledek"></div>
+        </div>
+      </form>
+    </section>
   </main>
-
-  <section id="test">
-    <h2>Závěrečný test</h2>
-
-    <form id="quizForm">
-
-      <div class="latex-block">
-        <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
-        <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label><br>
-        <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label><br>
-        <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label><br>
-        <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
-      </div>
-
-      <div class="latex-block">
-        <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
-        <label><input type="radio" name="q2" value="A"> \( 8\pi \)</label><br>
-        <label><input type="radio" name="q2" value="B"> \( 4\pi \)</label><br>
-        <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label><br>
-        <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
-      </div>
-
-      <div class="latex-block">
-        <p><strong>3. Jaký je výsledek výrazu \( \log_{2}(8) \)?</strong></p>
-        <label><input type="radio" name="q3" value="A"> 2</label><br>
-        <label><input type="radio" name="q3" value="B"> 3</label><br>
-        <label><input type="radio" name="q3" value="C"> 4</label><br>
-        <label><input type="radio" name="q3" value="D"> 1</label>
-      </div>
-
-      <div class="latex-block">
-        <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
-        <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label><br>
-        <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label><br>
-        <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label><br>
-        <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
-      </div>
-
-      <div class="latex-block">
-        <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
-        <label><input type="radio" name="q5" value="A"> 180°</label><br>
-        <label><input type="radio" name="q5" value="B"> 270°</label><br>
-        <label><input type="radio" name="q5" value="C"> 360°</label><br>
-        <label><input type="radio" name="q5" value="D"> 90°</label>
-      </div>
-
-      <div class="latex-block" style="text-align: center;">
-        <button type="button" onclick="vyhodnotitTest()" style="padding: 0.5rem 1rem; background-color: #2c3e50; color: white; border: none; border-radius: 4px; font-weight: bold;">Vyhodnotit test</button>
-        <div id="vysledek" style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;"></div>
-      </div>
-
-    </form>
-  </section>
 
   <footer>
     &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
@@ -210,14 +269,14 @@
       const vysledek = document.getElementById("vysledek");
       vysledek.innerText = `Získal(a) jsi ${body} z 5 bodů.`;
 
-      // ✅ Automatický reset po 3 sekundách
+      // Automatický reset po 3 sekundách
       setTimeout(() => {
         document.getElementById("quizForm").reset();
         vysledek.innerText = "";
       }, 3000);
     }
 
-    // ✅ Reset testu při načtení stránky
+    // Reset při načtení stránky
     window.addEventListener("load", () => {
       const form = document.getElementById("quizForm");
       if (form) form.reset();
