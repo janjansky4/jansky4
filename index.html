@@ -3,113 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Matematika moderně</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <title>Matematika pro SŠ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
+      background: #f0f4f8;
       margin: 0;
       padding: 0;
-      background: #f4f4f9;
-      color: #333;
     }
     header {
-      background: #6200ea;
+      background: #34495e;
       color: white;
       padding: 2rem;
       text-align: center;
     }
-    main {
-      padding: 2rem;
-      max-width: 800px;
-      margin: auto;
+    nav {
+      background: #2c3e50;
+      padding: 1rem;
+      text-align: center;
     }
-    section {
-      margin-bottom: 2rem;
+    nav a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     h1, h2 {
-      margin-bottom: 1rem;
+      color: #2c3e50;
     }
-    .formula {
-      background: #fff;
+    .latex-block {
+      background: #ecf0f1;
       padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      margin: 1rem 0;
+      font-size: 1.2rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #34495e;
+      color: white;
+      margin-top: 3rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Matematika moderně</h1>
-    <p>Objevte krásu rovnic a logiky</p>
+    <h1>Matematika pro střední školy</h1>
+    <p>Objev krásu matematiky s pomocí LaTeX</p>
   </header>
+  <nav>
+    <a href="#algebra">Algebra</a>
+    <a href="#geometrie">Geometrie</a>
+    <a href="#analyticka">Analytická geometrie</a>
+    <a href="#funkce">Funkce</a>
+    <a href="#derivace">Derivace</a>
+  </nav>
   <main>
-    <section>
-      <h2>📐 Pythagorova věta</h2>
-      <div class="formula">
-        $$ a^2 + b^2 = c^2 $$
+    <section id="algebra">
+      <h2>Algebra</h2>
+      <p>Řešení kvadratické rovnice:</p>
+      <div class="latex-block">
+        $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+      </div>
+      <p>Binomická věta:</p>
+      <div class="latex-block">
+        $$(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k$$
       </div>
     </section>
-    <section>
-      <h2>📊 Kvadratická rovnice</h2>
-      <div class="formula">
-        $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
-      </div>
-    </section>
-    <section>
-      <h2>📈 Derivace funkce</h2>
-      <div class="formula">
-        $$ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} $$
-      </div>
-    </section>
-    <section>
-  <h2>🧠 Mini kvíz</h2>
-  <form id="quizForm">
-    <div class="formula">
-      <p><strong>1. Jaký je výsledek výrazu  $$ a^2 + b^2 $$, pokud $$ a = 3 $$ a $$ b = 4 $$?</strong></p>
-      <label><input type="radio" name="q1" value="0"> 16</label><br>
-      <label><input type="radio" name="q1" value="1"> 25</label><br>
-      <label><input type="radio" name="q1" value="2"> 12</label><br>
-      <label><input type="radio" name="q1" value="3"> 7</label>
-    </div>
-    <div class="formula">
-      <p><strong>2. Co představuje 'c' v Pythagorově větě?</strong></p>
-      <label><input type="radio" name="q2" value="0"> Odvěsna</label><br>
-      <label><input type="radio" name="q2" value="1"> Obsah trojúhelníku</label><br>
-      <label><input type="radio" name="q2" value="2"> Přepona</label><br>
-      <label><input type="radio" name="q2" value="3"> Výška</label>
-    </div>
-    <div class="formula">
-      <p><strong>3. Co znamená limita v definici derivace?</strong></p>
-      <label><input type="radio" name="q3" value="0"> Změna směru</label><br>
-      <label><input type="radio" name="q3" value="1"> Přiblížení k určité hodnotě</label><br>
-      <label><input type="radio" name="q3" value="2"> Rozdíl mezi funkcemi</label><br>
-      <label><input type="radio" name="q3" value="3"> Součet hodnot</label>
-    </div>
-    <button type="button" onclick="vyhodnotitKviz()">Vyhodnotit</button>
-  </form>
-  <div id="vysledek" class="formula" style="margin-top:1rem;"></div>
-</section>
 
+    <section id="geometrie">
+      <h2>Geometrie</h2>
+      <p>Obsah kruhu:</p>
+      <div class="latex-block">
+        $$S = \pi r^2$$
+      </div>
+      <p>Obvod trojúhelníku:</p>
+      <div class="latex-block">
+        $$o = a + b + c$$
+      </div>
+    </section>
+
+    <section id="analyticka">
+      <h2>Analytická geometrie</h2>
+      <p>Rovnice přímky v rovině:</p>
+      <div class="latex-block">
+        $$y = kx + q$$
+      </div>
+      <p>Vzdálenost dvou bodů:</p>
+      <div class="latex-block">
+        $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
+      </div>
+    </section>
+
+    <section id="funkce">
+      <h2>Funkce</h2>
+      <p>Definice kvadratické funkce:</p>
+      <div class="latex-block">
+        $$f(x) = ax^2 + bx + c$$
+      </div>
+      <p>Exponenciální funkce:</p>
+      <div class="latex-block">
+        $$f(x) = a^x$$
+      </div>
+    </section>
+
+    <section id="derivace">
+      <h2>Derivace</h2>
+      <p>Derivace mocninné funkce:</p>
+      <div class="latex-block">
+        $$\frac{d}{dx} x^n = nx^{n-1}$$
+      </div>
+      <p>Derivace součtu funkcí:</p>
+      <div class="latex-block">
+        $$\frac{d}{dx}(f(x) + g(x)) = f'(x) + g'(x)$$
+      </div>
+    </section>
   </main>
-<script>
-  function vyhodnotitKviz() {
-    const spravne = [1, 2, 1];
-    let body = 0;
-    for (let i = 1; i <= spravne.length; i++) {
-      const odpoved = document.querySelector(`input[name="q${i}"]:checked`);
-      if (odpoved && parseInt(odpoved.value) === spravne[i - 1]) {
-        body++;
-      }
-    }
-    const vysledek = document.getElementById("vysledek");
-    vysledek.innerHTML = `<strong>Výsledek:</strong> ${body} z ${spravne.length} správně.`;
-  }
-</script>
-
-  
+  <footer>
+    &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
+  </footer>
 </body>
+</html>
