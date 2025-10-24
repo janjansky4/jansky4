@@ -181,25 +181,33 @@
     <div id="vysledek" style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;"></div>
   </div>
 
-  <script>
-    function vyhodnotitTest() {
-      const odpovedi = {
-        q1: "A",
-        q2: "C",
-        q3: "B",
-        q4: "A",
-        q5: "A"
-      };
-      let body = 0;
-      for (let i = 1; i <= 5; i++) {
-        const otazka = document.querySelector(`input[name="q${i}"]:checked`);
-        if (otazka && otazka.value === odpovedi[`q${i}`]) {
-          body++;
-        }
+<script>
+  // Vyhodnocení testu
+  function vyhodnotitTest() {
+    const odpovedi = {
+      q1: "A",
+      q2: "C",
+      q3: "B",
+      q4: "A",
+      q5: "A"
+    };
+    let body = 0;
+    for (let i = 1; i <= 5; i++) {
+      const otazka = document.querySelector(`input[name="q${i}"]:checked`);
+      if (otazka && otazka.value === odpovedi[`q${i}`]) {
+        body++;
       }
-      document.getElementById("vysledek").innerText = `Získal(a) jsi ${body} z 5 bodů.`;
     }
-  </script>
+    document.getElementById("vysledek").innerText = `Získal(a) jsi ${body} z 5 bodů.`;
+  }
+
+  // Reset testu při načtení stránky
+  window.addEventListener("load", () => {
+    document.getElementById("quizForm").reset();
+    document.getElementById("vysledek").innerText = "";
+  });
+</script>
+
 </section>
   <footer>
     &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
