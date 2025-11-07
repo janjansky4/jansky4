@@ -2,332 +2,485 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pac-Man</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tetris – webová hra</title>
   <style>
+    :root {
+      --bg: #111827;
+      --panel: #1f2937;
+      --text: #e5e7eb;
+      --accent: #3b82f6;
+      --grid: #374151;
+    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #000;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: var(--text);
     }
-    #game {
+    .wrap {
+      display: grid;
+      grid-template-columns: 320px 220px;
+      gap: 18px;
+      padding: 20px;
+    }
+    .board {
+      width: 320px; height: 640px; /* 10 x 20, každá buňka 32px */
+      background: var(--panel);
+      border: 2px solid #475569;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
       position: relative;
-      width: 560px;
-      height: 620px;
-      border: 4px solid #00f;
-      overflow: hidden;
-      background: #000;
     }
-    .wall { background: #00f; }
-    .dot { background: #ff0; width: 8px; height: 8px; border-radius: 50%; margin: 8px; }
-    .power { background: #fff; width: 12px; height: 12px; border-radius: 50%; margin: 6px; animation: blink 1s infinite; }
-    @keyframes blink { 0%,100% {opacity:1} 50%{opacity:0.5} }
-    #pacman {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      background: #ff0;
-      border-radius: 50%;
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20% 50%);
-      transition: none;
-      z-index: 10;
+    .grid {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(20, 1fr);
+      gap: 1px;
+      background: var(--grid);
+      padding: 1px;
     }
-    .ghost {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      z-index: 5;
+    .cell {
+      background: #0b1220;
+      width: 100%; height: 100%;
     }
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: #fff;
-      font-size: 20px;
-      z-index: 20;
+    .filled { background: #22d3ee; }
+    .ghost { background: rgba(34, 211, 238, .25); }
+    .piece-I { background: #22d3ee; }
+    .piece-O { background: #f59e0b; }
+    .piece-T { background: #8b5cf6; }
+    .piece-S { background: #10b981; }
+    .piece-Z { background: #ef4444; }
+    .piece-J { background: #3b82f6; }
+    .piece-L { background: #f97316; }
+
+    .side {
+      background: var(--panel);
+      border: 2px solid #475569;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
-    #game-over {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #f00;
-      font-size: 40px;
-      font-weight: bold;
-      display: none;
-      z-index: 30;
-      text-align: center;
+    .h1 { font-weight: 700; font-size: 20px; letter-spacing: .3px; }
+    .stat { display: flex; justify-content: space-between; align-items: center; background: #111827; padding: 8px 10px; border-radius: 8px; border: 1px solid #374151; }
+    .next {
+      display: grid; grid-template-columns: repeat(4, 24px); grid-template-rows: repeat(4, 24px);
+      gap: 2px; background: #111827; padding: 8px; border-radius: 8px; border: 1px solid #374151;
+      width: max-content;
+    }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button {
+      background: #2563eb; color: white; border: none; border-radius: 8px;
+      padding: 10px 12px; font-weight: 600; cursor: pointer;
+    }
+    button.secondary { background: #374151; }
+    .help { font-size: 12px; color: #cbd5e1; line-height: 1.45; }
+    .overlay {
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      background: rgba(0,0,0,.5); color: white;
+      font-weight: 700; font-size: 22px; text-align: center;
+      padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .overlay .box {
+      background: #111827; border: 2px solid #475569; padding: 20px; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="board">
+      <div id="grid" class="grid"></div>
+      <div id="overlay" class="overlay">
+        <div class="box">
+          <div id="overlay-title" style="font-size:24px;margin-bottom:10px;">Tetris</div>
+          <div id="overlay-text" style="margin-bottom:14px;">Stiskni Enter pro start</div>
+          <div class="help">
+            Ovládání: ← → posun, ↑ rotace, ↓ rychleji, Space drop, P pauza
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div id="game">
-  <div id="score">Skóre: 0</div>
-  <div id="game-over">KONEC HRY<br><small>Stiskni mezerník pro restart</small></div>
-</div>
+    <div class="side">
+      <div class="h1">Stav hry</div>
+      <div class="stat"><span>Skóre</span><strong id="score">0</strong></div>
+      <div class="stat"><span>Level</span><strong id="level">1</strong></div>
+      <div class="stat"><span>Řádky</span><strong id="lines">0</strong></div>
 
-<script>
-  // === KONFIGURACE HRY ===
-  const GRID_SIZE = 28;
-  const CELL_SIZE = 20;
-  const game = document.getElementById('game');
-  const scoreDisplay = document.getElementById('score');
-  const gameOverScreen = document.getElementById('game-over');
+      <div class="h1">Další dílek</div>
+      <div id="next" class="next"></div>
 
-  // Layout bludiště (1 = zeď, 0 = tečka, 2 = super tečka, 3 = prázdné)
-  const layout = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-    [1,2,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,2,1],
-    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
-    [1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
-    [1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,1,1,1,3,3,1,1,1,0,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1],
-    [3,3,3,3,3,3,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0,3,3,3,3,3,3],
-    [1,1,1,1,1,1,0,1,1,0,1,3,3,3,3,3,3,1,0,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,1,1,1],
-    [1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
-    [1,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,2,1],
-    [1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
-    [1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
-    [1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
-    [1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-  ];
+      <div class="h1">Ovládání</div>
+      <div class="btns">
+        <button id="btn-start">Start</button>
+        <button id="btn-pause" class="secondary">Pauza</button>
+      </div>
+      <div class="help">
+        Tip: Kombinace více řádků najednou dává víc bodů. Každých 10 řádků zvyšuje level a rychlost.
+      </div>
+    </div>
+  </div>
 
-  let grid = [];
-  let pacman = { x: 14, y: 23, dir: 'left', mouth: true };
-  let ghosts = [
-    { x: 13, y: 11, color: '#f00', dir: 'up', scared: false },
-    { x: 14, y: 11, color: '#ffb8ff', dir: 'up', scared: false },
-    { x: 15, y: 11, color: '#00ffff', dir: 'up', scared: false },
-    { x: 13, y: 14, color: '#ffb851', dir: 'down', scared: false }
-  ];
-  let score = 0;
-  let powerMode = false;
-  let powerTimer = 0;
-  let gameActive = true;
+  <script>
+    // --- Konfigurace ---
+    const COLS = 10, ROWS = 20, CELL = 32;
+    const SCORE_TABLE = [0, 100, 300, 500, 800]; // 1-4 řádky
+    const LEVEL_STEP_LINES = 10;
+    const BASE_SPEED_MS = 800; // level 1
+    const SPEED_FACTOR = 0.85; // násobek za level
+    const SPAWN_POS = { x: 3, y: 0 };
 
-  // === VYKRESLENÍ HRY ===
-  function createGrid() {
-    game.innerHTML = '<div id="score">Skóre: 0</div><div id="game-over">KONEC HRY<br><small>Stiskni mezerník pro restart</small></div>';
-    grid = [];
-    for (let y = 0; y < GRID_SIZE; y++) {
-      for (let x = 0; x < GRID_SIZE; x++) {
-        const cell = document.createElement('div');
-        cell.style.position = 'absolute';
-        cell.style.width = cell.style.height = CELL_SIZE + 'px';
-        cell.style.left = x * CELL_SIZE + 'px';
-        cell.style.top = y * CELL_SIZE + 'px';
-        cell.dataset.x = x;
-        cell.dataset.y = y;
+    // --- Stav hry ---
+    let board = createMatrix(COLS, ROWS);
+    let active = null;
+    let nextBag = [];
+    let tickHandle = null;
+    let running = false;
+    let paused = false;
 
-        if (layout[y][x] === 1) {
-          cell.className = 'wall';
-        } else if (layout[y][x] === 0) {
-          cell.className = 'dot';
-        } else if (layout[y][x] === 2) {
-          cell.className = 'power';
-        } else {
-          cell.style.background = '#000';
-        }
-        game.appendChild(cell);
-        grid.push(cell);
+    let score = 0, lines = 0, level = 1;
+
+    // --- UI ---
+    const gridEl = document.getElementById('grid');
+    const nextEl = document.getElementById('next');
+    const scoreEl = document.getElementById('score');
+    const linesEl = document.getElementById('lines');
+    const levelEl = document.getElementById('level');
+    const overlayEl = document.getElementById('overlay');
+    const ovTitle = document.getElementById('overlay-title');
+    const ovText = document.getElementById('overlay-text');
+
+    // Vykreslení prázdné mřížky
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        c.dataset.x = x; c.dataset.y = y;
+        gridEl.appendChild(c);
       }
     }
 
-    // Pac-Man
-    const pac = document.createElement('div');
-    pac.id = 'pacman';
-    game.appendChild(pac);
+    // --- Tetris dílky (tetromina) ---
+    const SHAPES = {
+      I: [
+        [[0,1],[1,1],[2,1],[3,1]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[0,2],[1,2],[2,2],[3,2]],
+        [[1,0],[1,1],[1,2],[1,3]],
+      ],
+      O: [
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+      ],
+      T: [
+        [[1,0],[0,1],[1,1],[2,1]],
+        [[1,0],[1,1],[2,1],[1,2]],
+        [[0,1],[1,1],[2,1],[1,2]],
+        [[1,0],[0,1],[1,1],[1,2]],
+      ],
+      S: [
+        [[1,0],[2,0],[0,1],[1,1]],
+        [[1,0],[1,1],[2,1],[2,2]],
+        [[1,1],[2,1],[0,2],[1,2]],
+        [[0,0],[0,1],[1,1],[1,2]],
+      ],
+      Z: [
+        [[0,0],[1,0],[1,1],[2,1]],
+        [[2,0],[1,1],[2,1],[1,2]],
+        [[0,1],[1,1],[1,2],[2,2]],
+        [[1,0],[0,1],[1,1],[0,2]],
+      ],
+      J: [
+        [[0,0],[0,1],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[1,2]],
+        [[0,1],[1,1],[2,1],[2,2]],
+        [[1,0],[1,1],[0,2],[1,2]],
+      ],
+      L: [
+        [[2,0],[0,1],[1,1],[2,1]],
+        [[1,0],[1,1],[1,2],[2,2]],
+        [[0,1],[1,1],[2,1],[0,2]],
+        [[0,0],[1,0],[1,1],[1,2]],
+      ],
+    };
+    const PIECES = Object.keys(SHAPES);
 
-    // Duchové
-    ghosts.forEach(g => {
-      const ghost = document.createElement('div');
-      ghost.className = 'ghost';
-      ghost.style.background = g.color;
-      ghost.dataset.id = ghosts.indexOf(g);
-      game.appendChild(ghost);
-    });
-
-    updatePositions();
-  }
-
-  function updatePositions() {
-    const pac = document.getElementById('pacman');
-    pac.style.left = pacman.x * CELL_SIZE + 'px';
-    pac.style.top = pacman.y * CELL_SIZE + 'px';
-    pac.style.transform = `rotate(${pacman.dir === 'right' ? 0 : pacman.dir === 'down' ? 90 : pacman.dir === 'left' ? 180 : 270}deg)`;
-    pac.style.clipPath = pacman.mouth
-      ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 20% 50%)'
-      : 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 50%)';
-
-    ghosts.forEach((g, i) => Create a simple Pac-Man game in HTML/CSS/JS.
-      const ghost = document.querySelectorAll('.ghost')[i];
-      ghost.style.left = g.x * CELL_SIZE + 'px';
-      ghost.style.top = g.y * CELL_SIZE + 'px';
-      ghost.style.background = powerMode && g.scared ? '#00f' : g.color;
-    });
-  }
-
-  // === POHYB PAC-MANA ===
-  const keys = {};
-  document.addEventListener('keydown', e => keys[e.key] = true);
-  document.addEventListener('keyup', e => keys[e.key] = false);
-
-  function movePacman() {
-    if (!gameActive) return;
-    let nx = pacman.x, ny = pacman.y;
-    if (keys['ArrowRight'] || keys['d']) { nx++; pacman.dir = 'right'; }
-    if (keys['ArrowLeft'] || keys['a']) { nx--; pacman.dir = 'left'; }
-    if (keys['ArrowDown'] || keys['s']) { ny++; pacman.dir = 'down'; }
-    if (keys['ArrowUp'] || keys['w']) { ny--; pacman.dir = 'up'; }
-
-    if (nx < 0) nx = GRID_SIZE - 1;
-    if (nx >= GRID_SIZE) nx = 0;
-
-    if (layout[ny][nx] !== 1) {
-      pacman.x = nx;
-      pacman.y = ny;
-
-      const cell = layout[ny][nx];
-      if (cell === 0) {
-        layout[ny][nx] = 3;
-        score += 10;
-      } else if (cell === 2) {
-        layout[ny][nx] = 3;
-        score += 50;
-        powerMode = true;
-        powerTimer = 150;
-        ghosts.forEach(g => g.scared = true);
+    // --- Náhodný výběr přes "7-bag" ---
+    function refillBag() {
+      const bag = [...PIECES];
+      for (let i = bag.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [bag[i], bag[j]] = [bag[j], bag[i]];
       }
-      scoreDisplay.textContent = `Skóre: ${score}`;
+      nextBag.push(...bag);
     }
 
-    // Animace pusinky
-    pacman.mouth = !pacman.mouth;
-    updatePositions();
-    checkWin();
-  }
-
-  // === POHYB DUCHŮ ===
-  function moveGhosts() {
-    if (!gameActive) return;
-    ghosts.forEach(g => {
-      if (powerTimer > 0 && g.scared) {
-        // Náhodný pohyb v power módu
-        const dirs = [['up',0,-1],['down',0,1],['left',-1,0],['right',1,0]];
-        const valid = dirs.filter(d => {
-          const nx = g.x + d[1], ny = g.y + d[2];
-          return nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE && layout[ny][nx] !== 1;
-        });
-        if (valid.length > 0) {
-          const rand = valid[Math.floor(Math.random() * valid.length)];
-          g.x += rand[1]; g.y += rand[2]; g.dir = rand[0];
-        }
+    function spawnPiece() {
+      if (nextBag.length < 3) refillBag();
+      const type = nextBag.shift();
+      active = {
+        type,
+        rot: 0,
+        x: SPAWN_POS.x,
+        y: SPAWN_POS.y,
+      };
+      if (collides(active, board)) {
+        gameOver();
       } else {
-        // Normální chování – honí Pac-Mana
-        const dx = pacman.x - g.x;
-        const dy = pacman.y - g.y;
-        const dirs = [];
-        if (Math.abs(dx) > Math.abs(dy)) {
-          dirs.push(dx > 0 ? 'right' : 'left');
-          dirs.push(dy > 0 ? 'down' : 'up');
-        } else {
-          dirs.push(dy > 0 ? 'down' : 'up');
-          dirs.push(dx > 0 ? 'right' : 'left');
+        render();
+        renderNextPreview();
+      }
+    }
+
+    // --- Kolize, zamykání, vymazání řádků ---
+    function collides(piece, field) {
+      for (const [dx, dy] of SHAPES[piece.type][piece.rot]) {
+        const x = piece.x + dx;
+        const y = piece.y + dy;
+        if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return true;
+        if (field[y][x]) return true;
+      }
+      return false;
+    }
+
+    function lockPiece() {
+      for (const [dx, dy] of SHAPES[active.type][active.rot]) {
+        const x = active.x + dx;
+        const y = active.y + dy;
+        board[y][x] = active.type;
+      }
+      const cleared = clearLines();
+      if (cleared > 0) {
+        score += SCORE_TABLE[cleared];
+        lines += cleared;
+        const newLevel = Math.floor(lines / LEVEL_STEP_LINES) + 1;
+        if (newLevel !== level) {
+          level = newLevel;
+          restartTick();
         }
-        for (const dir of dirs) {
-          let nx = g.x, ny = g.y;
-          if (dir === 'right') nx++;
-          if (dir === 'left') nx--;
-          if (dir === 'down') ny++;
-          if (dir === 'up') ny--;
-          if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE && layout[ny][nx] !== 1) {
-            g.x = nx; g.y = ny; g.dir = dir; break;
+        updateStats();
+      }
+      spawnPiece();
+    }
+
+    function clearLines() {
+      let cleared = 0;
+      for (let y = ROWS - 1; y >= 0; y--) {
+        if (board[y].every(v => v)) {
+          board.splice(y, 1);
+          board.unshift(Array(COLS).fill(null));
+          cleared++;
+          y++; // zůstat na stejném indexu po posunu
+        }
+      }
+      return cleared;
+    }
+
+    // --- Vykreslení ---
+    function render() {
+      // vyčistit všechna zobrazení
+      for (const cell of gridEl.children) {
+        cell.className = 'cell';
+      }
+      // statické bloky
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const idx = y * COLS + x;
+          const cell = gridEl.children[idx];
+          if (board[y][x]) {
+            cell.classList.add('filled', 'piece-' + board[y][x]);
           }
         }
       }
+      // ghost (drop náhled)
+      const ghost = { ...active };
+      while (!collides({ ...ghost, y: ghost.y + 1 }, board)) ghost.y++;
+      for (const [dx, dy] of SHAPES[ghost.type][ghost.rot]) {
+        const gx = ghost.x + dx, gy = ghost.y + dy;
+        const idx = gy * COLS + gx;
+        const cell = gridEl.children[idx];
+        cell.classList.add('ghost', 'piece-' + ghost.type);
+      }
+      // aktivní dílek
+      for (const [dx, dy] of SHAPES[active.type][active.rot]) {
+        const x = active.x + dx;
+        const y = active.y + dy;
+        const idx = y * COLS + x;
+        const cell = gridEl.children[idx];
+        cell.classList.add('piece-' + active.type);
+      }
+    }
 
-      // Kolize s Pac-Manem
-      if (g.x === pacman.x && g.y === pacman.y) {
-        if (powerMode && g.scared) {
-          score += 200;
-          g.x = 14; g.y = 14; // zpět do domečku
-        } else {
-          gameOver();
+    function renderNextPreview() {
+      nextEl.innerHTML = '';
+      const preview = Array.from({ length: 16 }, () => {
+        const c = document.createElement('div');
+        c.style.width = '24px'; c.style.height = '24px';
+        c.style.background = '#0b1220';
+        return c;
+      });
+      for (const c of preview) nextEl.appendChild(c);
+      const type = nextBag[0] || PIECES[0];
+      const shape = SHAPES[type][0];
+      const offset = { x: 0, y: 0 };
+      // centrování pro 4x4
+      const xs = shape.map(([x]) => x);
+      const ys = shape.map(([,y]) => y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const width = maxX - minX + 1;
+      const height = maxY - minY + 1;
+      offset.x = Math.floor((4 - width) / 2) - minX;
+      offset.y = Math.floor((4 - height) / 2) - minY;
+
+      for (const [dx, dy] of shape) {
+        const x = dx + offset.x;
+        const y = dy + offset.y;
+        const idx = y * 4 + x;
+        preview[idx].style.background = getComputedStyle(gridEl).getPropertyValue('--panel');
+        preview[idx].classList.add('piece-' + type);
+      }
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score;
+      linesEl.textContent = lines;
+      levelEl.textContent = level;
+    }
+
+    // --- Tick smyčka ---
+    function startTick() {
+      const speed = Math.max(80, Math.floor(BASE_SPEED_MS * Math.pow(SPEED_FACTOR, level - 1)));
+      tickHandle = setInterval(() => {
+        if (!running || paused) return;
+        stepDown();
+      }, speed);
+    }
+    function stopTick() { if (tickHandle) clearInterval(tickHandle); tickHandle = null; }
+    function restartTick() { stopTick(); startTick(); }
+
+    function stepDown() {
+      const trial = { ...active, y: active.y + 1 };
+      if (!collides(trial, board)) {
+        active.y++;
+        render();
+      } else {
+        lockPiece();
+      }
+    }
+
+    // --- Ovládání ---
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Enter' && !running) { startGame(); return; }
+      if (!running) return;
+
+      if (e.code === 'KeyP') { togglePause(); return; }
+      if (paused) return;
+
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault();
+
+      if (e.code === 'ArrowLeft') move(-1);
+      else if (e.code === 'ArrowRight') move(1);
+      else if (e.code === 'ArrowDown') softDrop();
+      else if (e.code === 'ArrowUp') rotate(1);
+      else if (e.code === 'Space') hardDrop();
+    });
+
+    function move(dir) {
+      const trial = { ...active, x: active.x + dir };
+      if (!collides(trial, board)) {
+        active.x += dir;
+        render();
+      }
+    }
+
+    function softDrop() {
+      const trial = { ...active, y: active.y + 1 };
+      if (!collides(trial, board)) {
+        active.y++;
+        score += 1; // malé bonusy za manuální drop
+        updateStats();
+        render();
+      } else {
+        lockPiece();
+      }
+    }
+
+    function rotate(dir) {
+      const trial = { ...active, rot: (active.rot + dir + 4) % 4 };
+      // jednoduché wall-kicky
+      const kicks = [
+        { x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: -2, y: 0 }, { x: 2, y: 0 },
+        { x: 0, y: -1 }, { x: -1, y: -1 }, { x: 1, y: -1 },
+      ];
+      for (const k of kicks) {
+        const t = { ...trial, x: trial.x + k.x, y: trial.y + k.y };
+        if (!collides(t, board)) {
+          active = t;
+          render();
+          return;
         }
       }
-    });
-    updatePositions();
-  }
-
-  function gameOver() {
-    gameActive = false;
-    gameOverScreen.style.display = 'block';
-  }
-
-  function checkWin() {
-    if (layout.flat().filter(c => c === 0 || c === 2).length === 0) {
-      gameActive = false;
-      gameOverScreen.textContent = 'VYHRÁL JSI!\nSkóre: ' + score;
-      gameOverScreen.style.display = 'block';
     }
-  }
 
-  // === HLAVNÍ SMYČKA ===
-  function gameLoop() {
-    movePacman();
-    if (Math.random() < 0.3) moveGhosts(); // duchové se pohybují pomaleji
-    if (powerTimer > 0) {
-      powerTimer--;
-      if (powerTimer === 0) {
-        powerMode = false;
-        ghosts.forEach(g => g.scared = false);
+    function hardDrop() {
+      let dropped = 0;
+      while (!collides({ ...active, y: active.y + 1 }, board)) {
+        active.y++; dropped++;
       }
+      score += dropped * 2;
+      updateStats();
+      render();
+      lockPiece();
     }
-    requestAnimationFrame(gameLoop);
-  }
 
-  // === RESTART ===
-  document.addEventListener('keydown', e => {
-    if (e.key === ' ' && !gameActive) {
-      location.reload();
+    // --- Životní cyklus hry ---
+    function startGame() {
+      board = createMatrix(COLS, ROWS);
+      nextBag = [];
+      score = 0; lines = 0; level = 1;
+      updateStats();
+      running = true; paused = false;
+      overlay(false);
+      refillBag();
+      spawnPiece();
+      startTick();
     }
-  });
 
-  // Spuštění
-  createGrid();
-  setInterval(() => {
-    const dots = document.querySelectorAll('.dot, .power');
-    dots.forEach(d => {
-      if (layout[parseInt(d.dataset.y)][parseInt(d.dataset.x)] === 3) {
-        d.style.background = '#000';
-      }
-    });
-  }, 100);
-  requestAnimationFrame(gameLoop);
-</script>
+    function togglePause() {
+      paused = !paused;
+      overlay(paused, paused ? 'Pauza' : '', paused ? 'Stiskni P pro pokračování' : '');
+    }
 
+    function gameOver() {
+      running = false; stopTick();
+      overlay(true, 'Konec hry', 'Stiskni Enter pro nový start');
+    }
+
+    function overlay(show, title='Tetris', text='Stiskni Enter pro start') {
+      ovTitle.textContent = title;
+      ovText.textContent = text;
+      overlayEl.classList.toggle('show', !!show);
+    }
+
+    // --- Pomocné ---
+    function createMatrix(w, h) {
+      return Array.from({ length: h }, () => Array(w).fill(null));
+    }
+
+    // První obrazovka
+    overlay(true);
+    renderNextPreview();
+  </script>
 </body>
 </html>
