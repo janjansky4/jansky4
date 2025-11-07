@@ -2,511 +2,151 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pac‑Man – webová hra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pac-Man</title>
   <style>
-    :root {
-      --bg: #0b1020;
-      --text: #e5e7eb;
-      --maze: #0f172a;
-      --wall: #1e3a8a;
-      --gate: #7dd3fc;
-      --dot: #ffd166;
-      --power: #ff6b6b;
-      --pac: #fcd34d;
-      --blinky: #ef4444;
-      --pinky: #f472b6;
-      --inky: #22d3ee;
-      --clyde: #f59e0b;
-      --fright: #60a5fa;
-    }
-    * { box-sizing: border-box; }
     body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(1200px 1200px at 10% 10%, #0e1a3a 0%, var(--bg) 40%, #070a14 100%);
-      color: var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
     }
 
-    .wrap {
-      display: grid;
-      gap: 16px;
-      padding: 20px;
-      grid-template-columns: auto;
+    canvas {
+      background: #000;
+      border: 2px solid #222;
     }
-
-    .hud {
-      display: flex; gap: 16px; align-items: center; justify-content: center;
-      font-weight: 700;
-    }
-    .hud .stat {
-      background: #0f172a; border: 1px solid #1f2937; border-radius: 10px; padding: 8px 12px;
-    }
-
-    .board {
-      position: relative;
-      width: 560px; height: 640px; /* 28 x 32 buněk po 20px */
-      border: 2px solid #1f2937; border-radius: 10px;
-      background: var(--maze);
-      box-shadow: 0 10px 25px rgba(0,0,0,.35);
-      overflow: hidden;
-    }
-
-    .grid {
-      position: absolute; inset: 0;
-      display: grid;
-      grid-template-columns: repeat(28, 20px);
-      grid-template-rows: repeat(32, 20px);
-    }
-
-    .cell {
-      width: 20px; height: 20px;
-      display: grid; place-items: center;
-    }
-    .wall { background: rgba(30,58,138,.45); box-shadow: inset 0 0 0 2px var(--wall); }
-    .gate { background: rgba(125,211,252,.15); box-shadow: inset 0 0 0 2px var(--gate); }
-    .dot::after {
-      content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--dot);
-      box-shadow: 0 0 6px rgba(255,209,102,.7);
-    }
-    .power::after {
-      content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--power);
-      box-shadow: 0 0 10px rgba(255,107,107,.8);
-    }
-
-    .entity {
-      position: absolute; width: 18px; height: 18px; margin: 1px; border-radius: 50%;
-      transition: transform .08s linear;
-    }
-    .pac { background: var(--pac); box-shadow: 0 0 10px rgba(252,211,77,.8); }
-    .ghost { box-shadow: 0 0 12px rgba(255,255,255,.15); }
-    .blinky { background: var(--blinky); }
-    .pinky { background: var(--pinky); }
-    .inky { background: var(--inky); }
-    .clyde { background: var(--clyde); }
-    .frightened { background: var(--fright) !important; box-shadow: 0 0 12px rgba(96,165,250,.9) !important; }
-
-    .overlay {
-      position: absolute; inset: 0;
-      display: grid; place-items: center;
-      background: rgba(0,0,0,.5); color: white;
-      font-weight: 700; text-align: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity .2s ease;
-    }
-    .overlay.show { opacity: 1; pointer-events: auto; }
-    .overlay .box {
-      background: #0f172a; border: 2px solid #1f2937; padding: 20px; border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.35);
-    }
-
-    .controls {
-      display: flex; gap: 8px; justify-content: center;
-    }
-    button {
-      background: #2563eb; color: white; border: none; border-radius: 8px;
-      padding: 10px 12px; font-weight: 700; cursor: pointer;
-    }
-    button.secondary { background: #374151; }
-    .tip { font-size: 12px; color: #cbd5e1; text-align: center; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hud">
-      <div class="stat">Skóre: <span id="score">0</span></div>
-      <div class="stat">Životy: <span id="lives">3</span></div>
-      <div class="stat">Level: <span id="level">1</span></div>
-    </div>
-
-    <div class="board">
-      <div id="grid" class="grid"></div>
-
-      <div id="pac" class="entity pac"></div>
-      <div id="ghost1" class="entity ghost blinky"></div>
-      <div id="ghost2" class="entity ghost pinky"></div>
-      <div id="ghost3" class="entity ghost inky"></div>
-      <div id="ghost4" class="entity ghost clyde"></div>
-
-      <div id="overlay" class="overlay">
-        <div class="box">
-          <div id="ov-title" style="font-size:24px;margin-bottom:6px;">Pac‑Man</div>
-          <div id="ov-text" style="margin-bottom:12px;">Stiskni Enter pro start</div>
-          <div class="controls">
-            <button id="btn-start">Start</button>
-            <button id="btn-pause" class="secondary">Pauza</button>
-          </div>
-          <div class="tip" style="margin-top:10px;">
-            Ovládání: Šipky nebo WASD, P pauza, Enter restart po prohře.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <canvas id="game" width="448" height="496"></canvas>
 
   <script>
-    // --- Konfigurace ---
-    const COLS = 28, ROWS = 32, CELL = 20;
-    const TICK_MS = 80;
-    const PAC_SPEED = 1;         // buněk za tick (směrové kroky se vyhlazují)
-    const GHOST_SPEED = 1;       // duchové pohybují se po mřížce
-    const FRIGHTENED_TIME = 6000; // ms
-    const EAT_DOT = 10, EAT_POWER = 50, EAT_GHOST_BASE = 200;
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
 
-    // --- Map encoding ---
-    // 0 empty, 1 wall, 2 dot, 3 power, 4 gate (dveře do "jídelny" duchů)
-    // Jednoduché bludiště inspirované původním layoutem (symetrické bloky).
-    const MAZE = [
-      "1111111111111111111111111111",
-      "1222222222111111222222222221",
-      "1211111112111111211111112121",
-      "1311111112222222211111113131",
-      "1211111112111111211111112121",
-      "1222222222111111222222222221",
-      "1111111111114111111111111111",
-      "1000000000011111000000000001",
-      "1211112112011111211201111121",
-      "1211112112222222211201111121",
-      "1222222112111111211202222221",
-      "1111111112111111211111111111",
-      "1000000012000000210000000001",
-      "1211111111111111111111111121",
-      "1211112222222222222221111121",
-      "1211112111111111111211111121",
-      "1222222111114111111212222221",
-      "1211112111111111111211111121",
-      "1211112222222222222221111121",
-      "1211111111111111111111111121",
-      "1311110000000000000001111131",
-      "1211111111111111111111111121",
-      "1222222222222222222222222221",
-      "1111111111111111111111111111",
-      "1111111111111111111111111111",
-      "1222222222111111222222222221",
-      "1211111112111111211111112121",
-      "1211111112222222211111112121",
-      "1211111112111111211111112121",
-      "1222222222111111222222222221",
-      "1000000000011111000000000001",
-      "1111111111111111111111111111",
-    ].map(row => row.split("").map(n => +n));
-
-    // --- Stav hry ---
-    const gridEl = document.getElementById('grid');
-    const overlayEl = document.getElementById('overlay');
-    const ovTitle = document.getElementById('ov-title');
-    const ovText = document.getElementById('ov-text');
-    const btnStart = document.getElementById('btn-start');
-    const btnPause = document.getElementById('btn-pause');
-
-    const scoreEl = document.getElementById('score');
-    const livesEl = document.getElementById('lives');
-    const levelEl = document.getElementById('level');
-
-    const pacEl = document.getElementById('pac');
-    const gEls = [
-      document.getElementById('ghost1'),
-      document.getElementById('ghost2'),
-      document.getElementById('ghost3'),
-      document.getElementById('ghost4')
+    const tileSize = 16;
+    const map = [
+      "############################",
+      "#............##............#",
+      "#.####.#####.##.#####.####.#",
+      "#o####.#####.##.#####.####o#",
+      "#.####.#####.##.#####.####.#",
+      "#..........................#",
+      "#.####.##.########.##.####.#",
+      "#.####.##.########.##.####.#",
+      "#......##....##....##......#",
+      "######.##### ## #####.######",
+      "     #.##### ## #####.#     ",
+      "     #.##          ##.#     ",
+      "     #.## ###--### ##.#     ",
+      "######.## #      # ##.######",
+      "      .   #      #   .      ",
+      "######.## #      # ##.######",
+      "     #.## ######## ##.#     ",
+      "     #.##          ##.#     ",
+      "     #.## ######## ##.#     ",
+      "######.## ######## ##.######",
+      "#............##............#",
+      "#.####.#####.##.#####.####.#",
+      "#o..##................##..o#",
+      "###.##.##.########.##.##.###",
+      "#......##....##....##......#",
+      "#.##########.##.##########.#",
+      "#..........................#",
+      "############################"
     ];
 
-    let score = 0, lives = 3, level = 1;
-    let running = false, paused = false;
-    let tickHandle = null;
+    const pacman = {
+      x: 14 * tileSize,
+      y: 23 * tileSize,
+      dx: 0,
+      dy: 0,
+      speed: 2,
+      mouth: 0,
+      mouthDir: 1
+    };
 
-    const pac = { x: 14, y: 23, dir: {x:0,y:0}, pending: {x:0,y:0} };
-    const ghosts = [
-      { x: 14, y: 15, dir: {x:0,y:0}, mode: 'scatter', name: 'blinky', frightenedUntil: 0 },
-      { x: 13, y: 15, dir: {x:0,y:0}, mode: 'scatter', name: 'pinky', frightenedUntil: 0 },
-      { x: 15, y: 15, dir: {x:0,y:0}, mode: 'scatter', name: 'inky', frightenedUntil: 0 },
-      { x: 16, y: 15, dir: {x:0,y:0}, mode: 'scatter', name: 'clyde', frightenedUntil: 0 },
-    ];
-    let ghostCombo = 0;
-
-    // --- Vykreslení mřížky ---
-    function renderMaze() {
-      gridEl.innerHTML = '';
-      for (let y=0; y<ROWS; y++) {
-        for (let x=0; x<COLS; x++) {
-          const c = document.createElement('div');
-          c.className = 'cell';
-          const v = MAZE[y][x];
-          if (v === 1) c.classList.add('wall');
-          else if (v === 2) c.classList.add('dot');
-          else if (v === 3) c.classList.add('power');
-          else if (v === 4) c.classList.add('gate');
-          gridEl.appendChild(c);
-        }
-      }
-    }
-
-    function setPosition(el, x, y) {
-      const px = (x * CELL), py = (y * CELL);
-      el.style.transform = `translate(${px}px, ${py}px)`;
-    }
-
-    function renderEntities() {
-      setPosition(pacEl, pac.x, pac.y);
-      for (let i=0;i<ghosts.length;i++) {
-        const g = ghosts[i];
-        setPosition(gEls[i], g.x, g.y);
-        gEls[i].classList.toggle('frightened', isFrightened(g));
-      }
-    }
-
-    // --- Ovládání ---
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Enter' && !running) { startGame(); return; }
-      if (e.code === 'KeyP') { togglePause(); return; }
-      if (!running || paused) return;
-
-      const mapKey = {
-        ArrowUp: {x:0,y:-1}, ArrowDown: {x:0,y:1}, ArrowLeft: {x:-1,y:0}, ArrowRight: {x:1,y:0},
-        KeyW: {x:0,y:-1}, KeyS: {x:0,y:1}, KeyA: {x:-1,y:0}, KeyD: {x:1,y:0}
-      };
-      const dir = mapKey[e.code];
-      if (!dir) return;
-      e.preventDefault();
-      pac.pending = dir;
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp") { pacman.dx = 0; pacman.dy = -pacman.speed; }
+      if (e.key === "ArrowDown") { pacman.dx = 0; pacman.dy = pacman.speed; }
+      if (e.key === "ArrowLeft") { pacman.dx = -pacman.speed; pacman.dy = 0; }
+      if (e.key === "ArrowRight") { pacman.dx = pacman.speed; pacman.dy = 0; }
     });
 
-    btnStart.addEventListener('click', () => { if (!running) startGame(); });
-    btnPause.addEventListener('click', () => togglePause());
-
-    // --- Pomocné funkce ---
-    function isWall(x,y) { return MAZE[y] && MAZE[y][x] === 1; }
-    function isGate(x,y) { return MAZE[y] && MAZE[y][x] === 4; }
-    function passable(x,y) { return MAZE[y] && MAZE[y][x] !== 1; }
-    function wrap(x,y) {
-      // tunely po stranách
-      if (x < 0) x = COLS-1;
-      if (x >= COLS) x = 0;
-      return {x,y};
-    }
-
-    function moveAttempt(entity, dir) {
-      const nx = entity.x + dir.x;
-      const ny = entity.y + dir.y;
-      const w = isWall(nx, ny);
-      const g = isGate(nx, ny);
-      // Pac‑Man nemůže projít zdí ani gate; duchové mohou skrz gate
-      if (entity === pac) {
-        if (w || g) return false;
-      } else {
-        if (w) return false;
-      }
-      entity.x = nx; entity.y = ny;
-      const wrapped = wrap(entity.x, entity.y);
-      entity.x = wrapped.x; entity.y = wrapped.y;
-      return true;
-    }
-
-    // --- Ticking ---
-    function startTick() {
-      tickHandle = setInterval(step, TICK_MS);
-    }
-    function stopTick() { if (tickHandle) clearInterval(tickHandle); tickHandle = null; }
-
-    function step() {
-      // Pac‑Man směrová změna na gridových uzlech
-      tryChangeDir();
-      movePac();
-
-      // Interakce s mřížkou (tečky, power)
-      consumeAtPac();
-
-      // Duchové – jednoduchá AI: pokud vystrašení, náhodně; jinak směrem k Pac‑Manovi s občasnou odbočkou
-      moveGhosts();
-
-      // Kolize s duchy
-      handleCollisions();
-
-      renderEntities();
-      checkWin();
-    }
-
-    function tryChangeDir() {
-      if (!pac.pending.x && !pac.pending.y) return;
-      const canChange = passable(pac.x + pac.pending.x, pac.y + pac.pending.y) && !isGate(pac.x + pac.pending.x, pac.y + pac.pending.y);
-      if (canChange) pac.dir = pac.pending;
-    }
-
-    function movePac() {
-      // Pac‑Man se pohybuje po mřížce po 1 buňce za tick
-      if (pac.dir.x === 0 && pac.dir.y === 0) return;
-      moveAttempt(pac, pac.dir);
-    }
-
-    function consumeAtPac() {
-      const v = MAZE[pac.y][pac.x];
-      if (v === 2) {
-        MAZE[pac.y][pac.x] = 0;
-        score += EAT_DOT;
-        updateHud();
-      } else if (v === 3) {
-        MAZE[pac.y][pac.x] = 0;
-        score += EAT_POWER;
-        ghostCombo = 0;
-        frightenGhosts();
-        updateHud();
-      }
-    }
-
-    function frightenGhosts() {
-      const until = performance.now() + FRIGHTENED_TIME;
-      ghosts.forEach(g => g.frightenedUntil = until);
-    }
-    function isFrightened(g) { return performance.now() < g.frightenedUntil; }
-
-    function moveGhosts() {
-      for (const g of ghosts) {
-        const dirs = [
-          {x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}
-        ];
-        // Duchové nemohou otočit zpět o 180°, preferují směry bez zdí
-        const filtered = dirs.filter(d => !(d.x === -g.dir.x && d.y === -g.dir.y));
-
-        let chosen = null;
-        if (isFrightened(g)) {
-          // náhodný průchod bez zdí
-          const viable = filtered.filter(d => passable(g.x + d.x, g.y + d.y));
-          chosen = viable[Math.floor(Math.random() * viable.length)] || null;
-        } else {
-          // greedy směrem k Pac‑Manovi, občasná odbočka
-          const viable = filtered.filter(d => passable(g.x + d.x, g.y + d.y) || isGate(g.x + d.x, g.y + d.y));
-          viable.sort((a,b) => {
-            const da = distSq(g.x + a.x, g.y + a.y, pac.x, pac.y);
-            const db = distSq(g.x + b.x, g.y + b.y, pac.x, pac.y);
-            return da - db;
-          });
-          chosen = (Math.random() < 0.8 ? viable[0] : viable[1]) || viable[0] || null;
-        }
-        if (chosen) {
-          g.dir = chosen;
-          moveAttempt(g, chosen);
-        }
-      }
-    }
-
-    function distSq(ax,ay,bx,by){ const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; }
-
-    function handleCollisions() {
-      for (const g of ghosts) {
-        if (g.x === pac.x && g.y === pac.y) {
-          if (isFrightened(g)) {
-            // sežer ducha
-            g.frightenedUntil = 0;
-            ghostCombo++;
-            score += EAT_GHOST_BASE * Math.pow(2, ghostCombo-1);
-            // po snědení pošleme ducha do "jídelny" (reset pozice)
-            const lair = { x: 14, y: 15 };
-            g.x = lair.x; g.y = lair.y; g.dir = {x:0,y:0};
-            updateHud();
-          } else {
-            // ztráta života
-            loseLife();
-            return; // pauza ticku kvůli animaci resetu
+    function drawMap() {
+      for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+          const tile = map[y][x];
+          if (tile === "#") {
+            ctx.fillStyle = "#1919A6";
+            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+          } else if (tile === ".") {
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(x * tileSize + 8, y * tileSize + 8, 2, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (tile === "o") {
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(x * tileSize + 8, y * tileSize + 8, 4, 0, Math.PI * 2);
+            ctx.fill();
           }
         }
       }
     }
 
-    function loseLife() {
-      lives--;
-      updateHud();
-      if (lives <= 0) {
-        gameOver();
-        return;
-      }
-      // reset pozic
-      pac.x = 14; pac.y = 23; pac.dir = {x:0,y:0}; pac.pending = {x:0,y:0};
-      ghosts.forEach((g,i) => { g.x = 14 + (i-1); g.y = 15; g.dir = {x:0,y:0}; g.frightenedUntil = 0; });
-      // krátká pauza
-      overlay(true, 'Život ztracen', 'Stiskni Enter nebo počkej…');
-      setTimeout(() => overlay(false), 800);
+    function drawPacman() {
+      pacman.mouth += pacman.mouthDir * 0.2;
+      if (pacman.mouth > 1 || pacman.mouth < 0) pacman.mouthDir *= -1;
+
+      let angle = Math.atan2(pacman.dy, pacman.dx);
+      if (isNaN(angle)) angle = 0;
+
+      ctx.fillStyle = "yellow";
+      ctx.beginPath();
+      ctx.moveTo(pacman.x + 8, pacman.y + 8);
+      ctx.arc(
+        pacman.x + 8,
+        pacman.y + 8,
+        8,
+        angle + pacman.mouth * 0.5,
+        angle + Math.PI * 2 - pacman.mouth * 0.5
+      );
+      ctx.closePath();
+      ctx.fill();
     }
 
-    function checkWin() {
-      // jestli nejsou žádné tečky ani power
-      for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) {
-        if (MAZE[y][x] === 2 || MAZE[y][x] === 3) return;
-      }
-      // další level: znovu nasypat tečky (bez zdí a gate)
-      level++;
-      refillDots();
-      updateHud();
-      // zrychlit duchy jemně
-      // (můžete rozšířit o dynamickou obtížnost)
-    }
+    function update() {
+      const newX = pacman.x + pacman.dx;
+      const newY = pacman.y + pacman.dy;
 
-    function refillDots() {
-      for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) {
-        if (MAZE[y][x] === 0) {
-          // okrajové cesty dostanou malé tečky
-          MAZE[y][x] = 2;
+      const gridX = Math.floor(newX / tileSize);
+      const gridY = Math.floor(newY / tileSize);
+
+      if (map[gridY] && map[gridY][gridX] !== "#") {
+        pacman.x = newX;
+        pacman.y = newY;
+
+        // Snědení bodu
+        const char = map[gridY][gridX];
+        if (char === "." || char === "o") {
+          map[gridY] = map[gridY].substring(0, gridX) + " " + map[gridY].substring(gridX + 1);
         }
       }
-      // pár power‑pellets do rohů průchozích míst
-      const corners = [
-        {x:1,y:1},{x:COLS-2,y:1},{x:1,y:ROWS-2},{x:COLS-2,y:ROWS-2}
-      ].filter(c => MAZE[c.y][c.x] !== 1);
-      corners.forEach(c => MAZE[c.y][c.x] = 3);
-      renderMaze();
     }
 
-    function updateHud() {
-      scoreEl.textContent = score;
-      livesEl.textContent = lives;
-      levelEl.textContent = level;
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawMap();
+      drawPacman();
+      update();
+      requestAnimationFrame(loop);
     }
 
-    // --- Životní cyklus ---
-    function startGame() {
-      // reset stavu
-      score = 0; lives = 3; level = 1; ghostCombo = 0;
-      // nakreslit mřížku z původního layoutu (deep copy)
-      for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++) {
-        // znovu nastavit tečky pro lépe hratelný první level
-        if (MAZE[y][x] === 0) MAZE[y][x] = (Math.random() < 0.06 ? 3 : 2);
-      }
-      pac.x = 14; pac.y = 23; pac.dir = {x:0,y:0}; pac.pending = {x:0,y:0};
-      ghosts.forEach((g,i) => { g.x = 14 + (i-1); g.y = 15; g.dir = {x:0,y:0}; g.frightenedUntil = 0; });
-
-      renderMaze();
-      renderEntities();
-      updateHud();
-
-      running = true; paused = false;
-      overlay(false);
-      startTick();
-    }
-
-    function togglePause() {
-      if (!running) return;
-      paused = !paused;
-      overlay(paused, paused ? 'Pauza' : '', paused ? 'Stiskni P pro pokračování' : '');
-      if (paused) stopTick(); else startTick();
-    }
-
-    function gameOver() {
-      running = false; stopTick();
-      overlay(true, 'Konec hry', `Skóre: ${score}. Stiskni Enter pro nový start.`);
-    }
-
-    function overlay(show, title='Pac‑Man', text='Stiskni Enter pro start') {
-      ovTitle.textContent = title;
-      ovText.textContent = text;
-      overlayEl.classList.toggle('show', !!show);
-    }
-
-    // init obrazovka
-    renderMaze();
-    renderEntities();
-    overlay(true);
+    loop();
   </script>
 </body>
 </html>
-
