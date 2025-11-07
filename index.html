@@ -1,288 +1,486 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Matematika pro SŠ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tetris – webová hra</title>
   <style>
-    /* === ZÁKLADNÍ STYL === */
+    :root {
+      --bg: #111827;
+      --panel: #1f2937;
+      --text: #e5e7eb;
+      --accent: #3b82f6;
+      --grid: #374151;
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #f0f4f8;
       margin: 0;
-      padding: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: var(--text);
     }
-
-    header {
-      background: #34495e;
-      color: white;
-      padding: 2rem;
-      text-align: center;
+    .wrap {
+      display: grid;
+      grid-template-columns: 320px 220px;
+      gap: 18px;
+      padding: 20px;
     }
-
-    nav {
-      background: #2c3e50;
-      padding: 1rem;
-      text-align: center;
+    .board {
+      width: 320px; height: 640px; /* 10 x 20, každá buňka 32px */
+      background: var(--panel);
+      border: 2px solid #475569;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+      position: relative;
     }
-
-    nav a {
-      color: white;
-      margin: 0 1rem;
-      text-decoration: none;
-      font-weight: bold;
+    .grid {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(20, 1fr);
+      gap: 1px;
+      background: var(--grid);
+      padding: 1px;
     }
-
-    nav a:hover {
-      text-decoration: underline;
+    .cell {
+      background: #0b1220;
+      width: 100%; height: 100%;
     }
+    .filled { background: #22d3ee; }
+    .ghost { background: rgba(34, 211, 238, .25); }
+    .piece-I { background: #22d3ee; }
+    .piece-O { background: #f59e0b; }
+    .piece-T { background: #8b5cf6; }
+    .piece-S { background: #10b981; }
+    .piece-Z { background: #ef4444; }
+    .piece-J { background: #3b82f6; }
+    .piece-L { background: #f97316; }
 
-    main {
-      max-width: 1000px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    .side {
+      background: var(--panel);
+      border: 2px solid #475569;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
-
-    h1, h2 {
-      color: #2c3e50;
+    .h1 { font-weight: 700; font-size: 20px; letter-spacing: .3px; }
+    .stat { display: flex; justify-content: space-between; align-items: center; background: #111827; padding: 8px 10px; border-radius: 8px; border: 1px solid #374151; }
+    .next {
+      display: grid; grid-template-columns: repeat(4, 24px); grid-template-rows: repeat(4, 24px);
+      gap: 2px; background: #111827; padding: 8px; border-radius: 8px; border: 1px solid #374151;
+      width: max-content;
     }
-
-    /* === SJEDNOCENÝ STYL KARTIČEK (teorie + test) === */
-    .card {
-      background: #ecf0f1;
-      padding: 1.2rem;
-      border-radius: 8px;
-      margin: 1.2rem 0;
-      font-size: 1.1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-
-    .card:hover {
-      transform: scale(1.01);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-    }
-
-    /* === TLAČÍTKA === */
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     button {
-      padding: 0.6rem 1.2rem;
-      background-color: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
+      background: #2563eb; color: white; border: none; border-radius: 8px;
+      padding: 10px 12px; font-weight: 600; cursor: pointer;
     }
-
-    button:hover {
-      background-color: #1a252f;
+    button.secondary { background: #374151; }
+    .help { font-size: 12px; color: #cbd5e1; line-height: 1.45; }
+    .overlay {
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      background: rgba(0,0,0,.5); color: white;
+      font-weight: 700; font-size: 22px; text-align: center;
+      padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s ease;
     }
-
-    /* === VÝSLEDEK TESTU === */
-    #vysledek {
-      margin-top: 1rem;
-      font-weight: bold;
-      font-size: 1.2rem;
-      color: #2c3e50;
-      background: #dff9fb;
-      padding: 0.6rem;
-      border-radius: 6px;
-      display: inline-block;
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem;
-      background: #34495e;
-      color: white;
-      margin-top: 3rem;
-    }
-
-    /* === FORM STYL === */
-    label {
-      display: block;
-      margin: 0.4rem 0;
-      cursor: pointer;
-    }
-
-    input[type="radio"] {
-      margin-right: 0.5rem;
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .overlay .box {
+      background: #111827; border: 2px solid #475569; padding: 20px; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Matematika pro střední školy</h1>
-    <p>Objev krásu matematiky s pomocí LaTeX</p>
-  </header>
-
-  <nav>
-    <a href="#algebra">Algebra</a>
-    <a href="#geometrie">Geometrie</a>
-    <a href="#analyticka">Analytická geometrie</a>
-    <a href="#funkce">Funkce</a>
-    <a href="#derivace">Derivace</a>
-    <a href="#test">Test</a>
-  </nav>
-
-  <main>
-    <section id="algebra">
-      <h2>Algebra</h2>
-      <div class="card">
-        <p><strong>Řešení kvadratické rovnice:</strong></p>
-        $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
-      </div>
-      <div class="card">
-        <p><strong>Binomická věta:</strong></p>
-        $$(a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k$$
-      </div>
-    </section>
-
-    <section id="geometrie">
-      <h2>Geometrie</h2>
-      <div class="card">
-        <p><strong>Obsah kruhu:</strong></p>
-        $$S = \pi r^2$$
-      </div>
-      <div class="card">
-        <p><strong>Obvod trojúhelníku:</strong></p>
-        $$o = a + b + c$$
-      </div>
-    </section>
-
-    <section id="analyticka">
-      <h2>Analytická geometrie</h2>
-      <div class="card">
-        <p><strong>Rovnice přímky v rovině:</strong></p>
-        $$y = kx + q$$
-      </div>
-      <div class="card">
-        <p><strong>Vzdálenost dvou bodů:</strong></p>
-        $$d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
-      </div>
-    </section>
-
-    <section id="funkce">
-      <h2>Funkce</h2>
-      <div class="card">
-        <p><strong>Definice kvadratické funkce:</strong></p>
-        $$f(x) = ax^2 + bx + c$$
-      </div>
-      <div class="card">
-        <p><strong>Exponenciální funkce:</strong></p>
-        $$f(x) = a^x$$
-      </div>
-    </section>
-
-    <section id="derivace">
-      <h2>Derivace</h2>
-      <div class="card">
-        <p><strong>Derivace mocninné funkce:</strong></p>
-        $$\frac{d}{dx} x^n = nx^{n-1}$$
-      </div>
-      <div class="card">
-        <p><strong>Derivace součtu funkcí:</strong></p>
-        $$(f(x) + g(x))' = f'(x) + g'(x)$$
-      </div>
-    </section>
-
-    <section id="test">
-      <h2>Závěrečný test</h2>
-      <form id="quizForm">
-        <div class="card">
-          <p><strong>1. Jaký je výsledek výrazu \( (2x + 3)(x - 5) \)?</strong></p>
-          <label><input type="radio" name="q1" value="A"> \( 2x^2 - 7x - 15 \)</label>
-          <label><input type="radio" name="q1" value="B"> \( 2x^2 + 7x - 15 \)</label>
-          <label><input type="radio" name="q1" value="C"> \( 2x^2 - 10x + 15 \)</label>
-          <label><input type="radio" name="q1" value="D"> \( 2x^2 - 13x - 15 \)</label>
+  <div class="wrap">
+    <div class="board">
+      <div id="grid" class="grid"></div>
+      <div id="overlay" class="overlay">
+        <div class="box">
+          <div id="overlay-title" style="font-size:24px;margin-bottom:10px;">Tetris</div>
+          <div id="overlay-text" style="margin-bottom:14px;">Stiskni Enter pro start</div>
+          <div class="help">
+            Ovládání: ← → posun, ↑ rotace, ↓ rychleji, Space drop, P pauza
+          </div>
         </div>
+      </div>
+    </div>
 
-        <div class="card">
-          <p><strong>2. Jaký je obsah kruhu o poloměru 4 cm?</strong></p>
-          <label><input type="radio" name="q2" value="A"> \( 8\pi \)</label>
-          <label><input type="radio" name="q2" value="B"> \( 4\pi \)</label>
-          <label><input type="radio" name="q2" value="C"> \( 16\pi \)</label>
-          <label><input type="radio" name="q2" value="D"> \( 12\pi \)</label>
-        </div>
+    <div class="side">
+      <div class="h1">Stav hry</div>
+      <div class="stat"><span>Skóre</span><strong id="score">0</strong></div>
+      <div class="stat"><span>Level</span><strong id="level">1</strong></div>
+      <div class="stat"><span>Řádky</span><strong id="lines">0</strong></div>
 
-        <div class="card">
-          <p><strong>3. Jaký je výsledek výrazu \( \log_{2}(8) \)?</strong></p>
-          <label><input type="radio" name="q3" value="A"> 2</label>
-          <label><input type="radio" name="q3" value="B"> 3</label>
-          <label><input type="radio" name="q3" value="C"> 4</label>
-          <label><input type="radio" name="q3" value="D"> 1</label>
-        </div>
+      <div class="h1">Další dílek</div>
+      <div id="next" class="next"></div>
 
-        <div class="card">
-          <p><strong>4. Jaká je derivace funkce \( \sin(x) \)?</strong></p>
-          <label><input type="radio" name="q4" value="A"> \( \cos(x) \)</label>
-          <label><input type="radio" name="q4" value="B"> \( -\cos(x) \)</label>
-          <label><input type="radio" name="q4" value="C"> \( \sin(x) \)</label>
-          <label><input type="radio" name="q4" value="D"> \( -\sin(x) \)</label>
-        </div>
-
-        <div class="card">
-          <p><strong>5. Jaký je součet vnitřních úhlů v trojúhelníku?</strong></p>
-          <label><input type="radio" name="q5" value="A"> 180°</label>
-          <label><input type="radio" name="q5" value="B"> 270°</label>
-          <label><input type="radio" name="q5" value="C"> 360°</label>
-          <label><input type="radio" name="q5" value="D"> 90°</label>
-        </div>
-
-        <div class="card" style="text-align: center;">
-          <button type="button" onclick="vyhodnotitTest()">Vyhodnotit test</button>
-          <div id="vysledek"></div>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <footer>
-    &copy; 2025 Matematika pro SŠ | Vytvořeno s láskou k číslům
-  </footer>
+      <div class="h1">Ovládání</div>
+      <div class="btns">
+        <button id="btn-start">Start</button>
+        <button id="btn-pause" class="secondary">Pauza</button>
+      </div>
+      <div class="help">
+        Tip: Kombinace více řádků najednou dává víc bodů. Každých 10 řádků zvyšuje level a rychlost.
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Vyhodnocení testu
-    function vyhodnotitTest() {
-      const odpovedi = {
-        q1: "A",
-        q2: "C",
-        q3: "B",
-        q4: "A",
-        q5: "A"
-      };
-      let body = 0;
-      for (let i = 1; i <= 5; i++) {
-        const otazka = document.querySelector(`input[name="q${i}"]:checked`);
-        if (otazka && otazka.value === odpovedi[`q${i}`]) {
-          body++;
-        }
-      }
-      const vysledek = document.getElementById("vysledek");
-      vysledek.innerText = `Získal(a) jsi ${body} z 5 bodů.`;
+    // --- Konfigurace ---
+    const COLS = 10, ROWS = 20, CELL = 32;
+    const SCORE_TABLE = [0, 100, 300, 500, 800]; // 1-4 řádky
+    const LEVEL_STEP_LINES = 10;
+    const BASE_SPEED_MS = 800; // level 1
+    const SPEED_FACTOR = 0.85; // násobek za level
+    const SPAWN_POS = { x: 3, y: 0 };
 
-      // Automatický reset po 3 sekundách
-      setTimeout(() => {
-        document.getElementById("quizForm").reset();
-        vysledek.innerText = "";
-      }, 3000);
+    // --- Stav hry ---
+    let board = createMatrix(COLS, ROWS);
+    let active = null;
+    let nextBag = [];
+    let tickHandle = null;
+    let running = false;
+    let paused = false;
+
+    let score = 0, lines = 0, level = 1;
+
+    // --- UI ---
+    const gridEl = document.getElementById('grid');
+    const nextEl = document.getElementById('next');
+    const scoreEl = document.getElementById('score');
+    const linesEl = document.getElementById('lines');
+    const levelEl = document.getElementById('level');
+    const overlayEl = document.getElementById('overlay');
+    const ovTitle = document.getElementById('overlay-title');
+    const ovText = document.getElementById('overlay-text');
+
+    // Vykreslení prázdné mřížky
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        c.dataset.x = x; c.dataset.y = y;
+        gridEl.appendChild(c);
+      }
     }
 
-    // Reset při načtení stránky
-    window.addEventListener("load", () => {
-      const form = document.getElementById("quizForm");
-      if (form) form.reset();
-      const vysledek = document.getElementById("vysledek");
-      if (vysledek) vysledek.innerText = "";
+    // --- Tetris dílky (tetromina) ---
+    const SHAPES = {
+      I: [
+        [[0,1],[1,1],[2,1],[3,1]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[0,2],[1,2],[2,2],[3,2]],
+        [[1,0],[1,1],[1,2],[1,3]],
+      ],
+      O: [
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[2,1]],
+      ],
+      T: [
+        [[1,0],[0,1],[1,1],[2,1]],
+        [[1,0],[1,1],[2,1],[1,2]],
+        [[0,1],[1,1],[2,1],[1,2]],
+        [[1,0],[0,1],[1,1],[1,2]],
+      ],
+      S: [
+        [[1,0],[2,0],[0,1],[1,1]],
+        [[1,0],[1,1],[2,1],[2,2]],
+        [[1,1],[2,1],[0,2],[1,2]],
+        [[0,0],[0,1],[1,1],[1,2]],
+      ],
+      Z: [
+        [[0,0],[1,0],[1,1],[2,1]],
+        [[2,0],[1,1],[2,1],[1,2]],
+        [[0,1],[1,1],[1,2],[2,2]],
+        [[1,0],[0,1],[1,1],[0,2]],
+      ],
+      J: [
+        [[0,0],[0,1],[1,1],[2,1]],
+        [[1,0],[2,0],[1,1],[1,2]],
+        [[0,1],[1,1],[2,1],[2,2]],
+        [[1,0],[1,1],[0,2],[1,2]],
+      ],
+      L: [
+        [[2,0],[0,1],[1,1],[2,1]],
+        [[1,0],[1,1],[1,2],[2,2]],
+        [[0,1],[1,1],[2,1],[0,2]],
+        [[0,0],[1,0],[1,1],[1,2]],
+      ],
+    };
+    const PIECES = Object.keys(SHAPES);
+
+    // --- Náhodný výběr přes "7-bag" ---
+    function refillBag() {
+      const bag = [...PIECES];
+      for (let i = bag.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [bag[i], bag[j]] = [bag[j], bag[i]];
+      }
+      nextBag.push(...bag);
+    }
+
+    function spawnPiece() {
+      if (nextBag.length < 3) refillBag();
+      const type = nextBag.shift();
+      active = {
+        type,
+        rot: 0,
+        x: SPAWN_POS.x,
+        y: SPAWN_POS.y,
+      };
+      if (collides(active, board)) {
+        gameOver();
+      } else {
+        render();
+        renderNextPreview();
+      }
+    }
+
+    // --- Kolize, zamykání, vymazání řádků ---
+    function collides(piece, field) {
+      for (const [dx, dy] of SHAPES[piece.type][piece.rot]) {
+        const x = piece.x + dx;
+        const y = piece.y + dy;
+        if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return true;
+        if (field[y][x]) return true;
+      }
+      return false;
+    }
+
+    function lockPiece() {
+      for (const [dx, dy] of SHAPES[active.type][active.rot]) {
+        const x = active.x + dx;
+        const y = active.y + dy;
+        board[y][x] = active.type;
+      }
+      const cleared = clearLines();
+      if (cleared > 0) {
+        score += SCORE_TABLE[cleared];
+        lines += cleared;
+        const newLevel = Math.floor(lines / LEVEL_STEP_LINES) + 1;
+        if (newLevel !== level) {
+          level = newLevel;
+          restartTick();
+        }
+        updateStats();
+      }
+      spawnPiece();
+    }
+
+    function clearLines() {
+      let cleared = 0;
+      for (let y = ROWS - 1; y >= 0; y--) {
+        if (board[y].every(v => v)) {
+          board.splice(y, 1);
+          board.unshift(Array(COLS).fill(null));
+          cleared++;
+          y++; // zůstat na stejném indexu po posunu
+        }
+      }
+      return cleared;
+    }
+
+    // --- Vykreslení ---
+    function render() {
+      // vyčistit všechna zobrazení
+      for (const cell of gridEl.children) {
+        cell.className = 'cell';
+      }
+      // statické bloky
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const idx = y * COLS + x;
+          const cell = gridEl.children[idx];
+          if (board[y][x]) {
+            cell.classList.add('filled', 'piece-' + board[y][x]);
+          }
+        }
+      }
+      // ghost (drop náhled)
+      const ghost = { ...active };
+      while (!collides({ ...ghost, y: ghost.y + 1 }, board)) ghost.y++;
+      for (const [dx, dy] of SHAPES[ghost.type][ghost.rot]) {
+        const gx = ghost.x + dx, gy = ghost.y + dy;
+        const idx = gy * COLS + gx;
+        const cell = gridEl.children[idx];
+        cell.classList.add('ghost', 'piece-' + ghost.type);
+      }
+      // aktivní dílek
+      for (const [dx, dy] of SHAPES[active.type][active.rot]) {
+        const x = active.x + dx;
+        const y = active.y + dy;
+        const idx = y * COLS + x;
+        const cell = gridEl.children[idx];
+        cell.classList.add('piece-' + active.type);
+      }
+    }
+
+    function renderNextPreview() {
+      nextEl.innerHTML = '';
+      const preview = Array.from({ length: 16 }, () => {
+        const c = document.createElement('div');
+        c.style.width = '24px'; c.style.height = '24px';
+        c.style.background = '#0b1220';
+        return c;
+      });
+      for (const c of preview) nextEl.appendChild(c);
+      const type = nextBag[0] || PIECES[0];
+      const shape = SHAPES[type][0];
+      const offset = { x: 0, y: 0 };
+      // centrování pro 4x4
+      const xs = shape.map(([x]) => x);
+      const ys = shape.map(([,y]) => y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const width = maxX - minX + 1;
+      const height = maxY - minY + 1;
+      offset.x = Math.floor((4 - width) / 2) - minX;
+      offset.y = Math.floor((4 - height) / 2) - minY;
+
+      for (const [dx, dy] of shape) {
+        const x = dx + offset.x;
+        const y = dy + offset.y;
+        const idx = y * 4 + x;
+        preview[idx].style.background = getComputedStyle(gridEl).getPropertyValue('--panel');
+        preview[idx].classList.add('piece-' + type);
+      }
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score;
+      linesEl.textContent = lines;
+      levelEl.textContent = level;
+    }
+
+    // --- Tick smyčka ---
+    function startTick() {
+      const speed = Math.max(80, Math.floor(BASE_SPEED_MS * Math.pow(SPEED_FACTOR, level - 1)));
+      tickHandle = setInterval(() => {
+        if (!running || paused) return;
+        stepDown();
+      }, speed);
+    }
+    function stopTick() { if (tickHandle) clearInterval(tickHandle); tickHandle = null; }
+    function restartTick() { stopTick(); startTick(); }
+
+    function stepDown() {
+      const trial = { ...active, y: active.y + 1 };
+      if (!collides(trial, board)) {
+        active.y++;
+        render();
+      } else {
+        lockPiece();
+      }
+    }
+
+    // --- Ovládání ---
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Enter' && !running) { startGame(); return; }
+      if (!running) return;
+
+      if (e.code === 'KeyP') { togglePause(); return; }
+      if (paused) return;
+
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault();
+
+      if (e.code === 'ArrowLeft') move(-1);
+      else if (e.code === 'ArrowRight') move(1);
+      else if (e.code === 'ArrowDown') softDrop();
+      else if (e.code === 'ArrowUp') rotate(1);
+      else if (e.code === 'Space') hardDrop();
     });
+
+    function move(dir) {
+      const trial = { ...active, x: active.x + dir };
+      if (!collides(trial, board)) {
+        active.x += dir;
+        render();
+      }
+    }
+
+    function softDrop() {
+      const trial = { ...active, y: active.y + 1 };
+      if (!collides(trial, board)) {
+        active.y++;
+        score += 1; // malé bonusy za manuální drop
+        updateStats();
+        render();
+      } else {
+        lockPiece();
+      }
+    }
+
+    function rotate(dir) {
+      const trial = { ...active, rot: (active.rot + dir + 4) % 4 };
+      // jednoduché wall-kicky
+      const kicks = [
+        { x: 0, y: 0 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: -2, y: 0 }, { x: 2, y: 0 },
+        { x: 0, y: -1 }, { x: -1, y: -1 }, { x: 1, y: -1 },
+      ];
+      for (const k of kicks) {
+        const t = { ...trial, x: trial.x + k.x, y: trial.y + k.y };
+        if (!collides(t, board)) {
+          active = t;
+          render();
+          return;
+        }
+      }
+    }
+
+    function hardDrop() {
+      let dropped = 0;
+      while (!collides({ ...active, y: active.y + 1 }, board)) {
+        active.y++; dropped++;
+      }
+      score += dropped * 2;
+      updateStats();
+      render();
+      lockPiece();
+    }
+
+    // --- Životní cyklus hry ---
+    function startGame() {
+      board = createMatrix(COLS, ROWS);
+      nextBag = [];
+      score = 0; lines = 0; level = 1;
+      updateStats();
+      running = true; paused = false;
+      overlay(false);
+      refillBag();
+      spawnPiece();
+      startTick();
+    }
+
+    function togglePause() {
+      paused = !paused;
+      overlay(paused, paused ? 'Pauza' : '', paused ? 'Stiskni P pro pokračování' : '');
+    }
+
+    function gameOver() {
+      running = false; stopTick();
+      overlay(true, 'Konec hry', 'Stiskni Enter pro nový start');
+    }
+
+    function overlay(show, title='Tetris', text='Stiskni Enter pro start') {
+      ovTitle.textContent = title;
+      ovText.textContent = text;
+      overlayEl.classList.toggle('show', !!show);
+    }
+
+    // --- Pomocné ---
+    function createMatrix(w, h) {
+      return Array.from({ length: h }, () => Array(w).fill(null));
+    }
+
+    // První obrazovka
+    overlay(true);
+    renderNextPreview();
   </script>
 </body>
 </html>
